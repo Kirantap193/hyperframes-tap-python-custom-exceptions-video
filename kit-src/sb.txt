@@ -1,0 +1,1323 @@
+## S1 TAP Academy opening sting [00:00 → 00:08 · 8s]
+SCR: Animated TAP Academy logo on a light patterned background.
+  00:00 fast White patterned backdrop; blue and yellow logo bars rise
+  00:06 ligh Hard cut to the studio set
+## S2 Recap: the try block [00:08 → 01:06 · 58s]
+SCR: Heading 'Valid :' in cyan, top-left. Presenter on the right.
+CODE:
+try :
+  00:08 sync Presenter centred; 'Valid :' heading top-left
+  00:40 ligh 'try :' snaps in under the heading
+## S3 Valid try / except / else / finally combinations [01:06 → 02:14 · 68s]
+SCR: Five keyword skeletons in magenta; each body is three white bars (shown as ===). Presenter stands between columns 2 and 3.
+CODE:
+try :        try :        try :        try :        try :
+  ===          ===          ===          ===          ===
+except :     except :     except :     except :     finally :
+  ===          ===          ===          ===          ===
+             else :       else :       finally :
+               ===          ===          ===
+                          finally
+                            ===
+  01:06 ligh Column 1: try / except
+  01:20 ligh Column 2: try / except / else
+  01:35 ligh Columns 3-4: try / except / else / finally, then try / except / finally
+  01:55 ligh Column 5: try / finally
+## S4 Nesting a try inside a try [02:14 → 02:36 · 22s]
+SCR: One nested skeleton on the left; presenter points at it from the right.
+CODE:
+try :
+    try :
+      ===
+    except :
+      ===
+    else :
+      ===
+    finally :
+      ===
+except :
+  ===
+  02:14 fast Previous columns clear
+  02:16 ligh Outer try : with an inner try / except / else / finally
+  02:25 ligh Closing outer except : snaps in
+## S5 Exception Hierarchy: title card [02:36 → 04:01 · 85s]
+SCR: Title 'Exception Hierarchy' in cyan. Presenter centred, no diagram yet.
+  02:36 fast 'Exception Hierarchy' title fades in, top centre
+  02:40 sync Presenter introduces the built-in exception classes
+## S6 BaseException and Exception [04:01 → 04:13 · 12s]
+SCR: Cyan-outlined boxes: BaseException (top centre), Exception (second row, left).
+  04:01 fast BaseException box at the top
+  04:06 fast Exception box on the second level; presenter gestures to it
+## S7 Second and third levels [04:13 → 05:01 · 48s]
+SCR: Tree grows left to right; connector lines draw from Exception down to each row-3 box.
+  04:13 ligh Row 2: Exception, SystemExit, GeneratorExit, KeyboardInterrupt, connector up to BaseException
+  04:25 ligh Row 3 under Exception: AttributeError, ArithmeticError, EOFError, NameError, LookupError, OSError, TypeError (60 ms stagger)
+## S8 Arithmetic errors [05:01 → 05:41 · 40s]
+SCR: Row 3 complete (8 boxes). The ArithmeticError branch drops three child boxes.
+  05:01 ligh ValueError joins the end of row 3
+  05:10 fast Under ArithmeticError: ZeroDivisionError, FloatingPointError, OverflowError
+## S9 Lookup and OS errors [05:41 → 07:10 · 89s]
+SCR: Full hierarchy tree on screen.
+  05:41 fast Under LookupError: IndexError, KeyError
+  06:10 fast Under OSError: FileNotFoundError, InterruptedError, PermissionError, TimeOutError
+## S10 Full hierarchy held [07:10 → 07:23 · 13s]
+SCR: Complete Exception Hierarchy tree, unchanged.
+  07:10 sync Hold the complete tree while the presenter summarises
+## S11 Why we need our own exceptions [07:23 → 08:22 · 59s]
+SCR: Complete Exception Hierarchy tree; presenter walks in front of it.
+  07:23 sync Hold the tree; narration moves to custom exceptions
+## S12 Mobile-number validator raising ValueError [08:22 → 08:59 · 37s]
+CODE:
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  08:22 ligh Full validate(mob) and main() code snaps in
+  08:30 sync Presenter walks through len(mob) == 10
+## S13 Run: a plain ValueError [08:59 → 09:49 · 50s]
+OUT:
+C:\Users\Studio\.spyder-py3>python temp.py
+99856
+Traceback (most recent call last):
+  File "temp.py", line 12, in <module>
+    main()
+  File "temp.py", line 10, in main
+    validate(mob)
+  File "temp.py", line 5, in validate
+    raise ValueError
+ValueError
+
+C:\Users\Studio\.spyder-py3>
+  08:59 ligh Cut to the green Matrix OutputWindow
+  09:05 ligh Input 99856
+  09:29 ligh Full traceback snaps in
+  09:41 ligh Highlight box on ValueError
+## S14 Back to the code [09:49 → 10:00 · 11s]
+CODE:
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  09:49 ligh Cut back to code; cursor below main()
+## S15 ValueError says nothing about the problem [10:00 → 11:26 · 86s]
+CODE:
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  10:00 sync Hold code; presenter explains the error name is not meaningful here
+## S16 Making room for a class [11:26 → 11:41 · 15s]
+CODE:
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  11:26 fast Code block slides down two lines
+## S17 Naming the custom exception [11:41 → 12:00 · 19s]
+CODE:
+class InvalidMobileNumberError
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  11:41 ligh Type 'class InvalidMobileNumberError' at the top
+## S18 Inherit from Exception [12:00 → 13:26 · 86s]
+SCR: UML class diagram on the right: Exception (top) <- Is-A <- InvalidMobileNumberError (bottom), yellow titles, cyan outlines.
+CODE:
+class InvalidMobileNumberError(Exception):
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  12:00 ligh Complete '(Exception):' and 'pass'
+  12:20 fast UML panel draws: Exception box, Is-A arrow, InvalidMobileNumberError box
+## S19 Replacing ValueError [13:26 → 13:36 · 10s]
+SCR: UML diagram stays on the right.
+CODE:
+class InvalidMobileNumberError(Exception):
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise In
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  13:26 ligh Delete ValueError; type 'raise In'
+## S20 raise InvalidMobileNumberError [13:36 → 14:03 · 27s]
+SCR: UML diagram stays on the right.
+CODE:
+class InvalidMobileNumberError(Exception):
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise InvalidMobileNumberError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  13:36 ligh Line completes: raise InvalidMobileNumberError
+## S21 Run again [14:03 → 14:11 · 8s]
+SCR: UML diagram overlays the OutputWindow on the right.
+OUT:
+C:\Users\Studio\.spyder-py3>python temp.py
+9
+  14:03 ligh Cut to OutputWindow; python temp.py; typing 9
+## S22 Traceback names the custom error [14:11 → 15:09 · 58s]
+OUT:
+C:\Users\Studio\.spyder-py3>python temp.py
+99856
+Traceback (most recent call last):
+  File "temp.py", line 16, in <module>
+    main()
+  File "temp.py", line 14, in main
+    validate(mob)
+  File "temp.py", line 9, in validate
+    raise InvalidMobileNumberError
+__main__.InvalidMobileNumberError
+
+C:\Users\Studio\.spyder-py3>
+  14:11 ligh Input 99856 completes
+  14:26 ligh Traceback snaps in
+  14:51 ligh Last line __main__.InvalidMobileNumberError
+  15:01 sync Presenter points to the custom name
+## S23 Passing a message [15:09 → 15:41 · 32s]
+SCR: UML diagram stays on the right.
+CODE:
+class InvalidMobileNumberError(Exception):
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise InvalidMobileNumberError('Enter 10 digit mobile number')
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  15:09 ligh Add ('Enter 10 digit mobile number') to the raise
+  15:26 sync Presenter explains the message argument
+## S24 Message appears in the traceback [15:41 → 16:15 · 34s]
+OUT:
+C:\Users\Studio\.spyder-py3>python temp.py
+99856
+Traceback (most recent call last):
+  File "temp.py", line 16, in <module>
+    main()
+  File "temp.py", line 14, in main
+    validate(mob)
+  File "temp.py", line 9, in validate
+    raise InvalidMobileNumberError('Enter 10 digit mobile number')
+__main__.InvalidMobileNumberError: Enter 10 digit mobile number
+
+C:\Users\Studio\.spyder-py3>
+  15:41 ligh Cut to output; traceback snaps in
+  15:55 ligh Highlight 'Enter 10 digit mobile number'
+  16:08 sync Hold
+## S25 What if the class has no parent? [16:15 → 17:32 · 77s]
+SCR: UML diagram still shows the Is-A link that no longer exists.
+CODE:
+class InvalidMobileNumberError():
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise InvalidMobileNumberError('Enter 10 digit mobile number')
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  16:15 ligh Delete 'Exception'; green highlight on the empty ()
+  16:40 sync Presenter asks what happens now
+## S26 Plain class, no inheritance [17:32 → 17:49 · 17s]
+CODE:
+class InvalidMobileNumberError:
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise InvalidMobileNumberError('Enter 10 digit mobile number')
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  17:32 ligh Parentheses removed: class InvalidMobileNumberError:
+  17:35 fast UML diagram fades out
+## S27 TypeError: takes no arguments [17:49 → 18:08 · 19s]
+OUT:
+C:\Users\Studio\.spyder-py3>python temp.py
+9856
+Traceback (most recent call last):
+  File "temp.py", line 16, in <module>
+    main()
+  File "temp.py", line 14, in main
+    validate(mob)
+  File "temp.py", line 9, in validate
+    raise InvalidMobileNumberError('Enter 10 digit mobile number')
+TypeError: InvalidMobileNumberError() takes no arguments
+
+C:\Users\Studio\.spyder-py3>
+  17:49 ligh Cut to output; input 9856
+  17:54 ligh Traceback snaps in
+  17:59 ligh Highlight 'InvalidMobileNumberError() takes no arguments'
+## S28 Remove the message too [18:08 → 18:23 · 15s]
+CODE:
+class InvalidMobileNumberError:
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print('Valid Mobile Number')
+    else:
+        raise InvalidMobileNumberError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()
+  18:08 ligh Delete the message argument
+  18:13 sync Presenter predicts the next error
+## S29 Exceptions must derive from BaseException [18:23 → 18:54 · 31s]
+OUT:
+C:\Users\Studio\.spyder-py3>python temp.py
+9856
+Traceback (most recent call last):
+  File "temp.py", line 16, in <module>
+    main()
+  File "temp.py", line 14, in main
+    validate(mob)
+  File "temp.py", line 9, in validate
+    raise InvalidMobileNumberError
+TypeError: exceptions must derive from BaseException
+
+C:\Users\Studio\.spyder-py3>
+  18:23 ligh Cut to output; traceback snaps in
+  18:37 ligh Last line: TypeError: exceptions must derive from BaseException
+  18:47 sync Presenter ties it back to the hierarchy
+## S30 Example 2: a food menu [18:54 → 19:39 · 45s]
+CODE:
+def menu(item):
+    if item=='pizza':
+        print('Enjoy your pizza')
+    elif item=='idli':
+        print('Enjoy your idli')
+    elif item=='burger':
+        print('Enjoy your burger')
+    else:
+        raise NameError
+
+def main():
+    item = input()
+    menu(item)
+
+main()
+  18:54 ligh menu(item) function and main() snap in
+  19:10 sync Presenter reads the pizza / idli / burger branches
+## S31 Run: pasta raises NameError [19:39 → 20:13 · 34s]
+OUT:
+C:\Users\Studio\.spyder-py3>python temp.py
+pasta
+Traceback (most recent call last):
+  File "temp.py", line 15, in <module>
+    main()
+  File "temp.py", line 13, in main
+    menu(item)
+  File "temp.py", line 9, in menu
+    raise NameError
+NameError
+
+C:\Users\Studio\.spyder-py3>
+  19:39 ligh Cut to output; input pasta
+  19:48 ligh Traceback snaps in
+  20:01 ligh Highlight NameError
+## S32 ItemNotInMenuError [20:13 → 21:30 · 77s]
+CODE:
+class ItemNotInMenuError(Exception):
+    pass
+
+
+def menu(item):
+    if item=='pizza':
+        print('Enjoy your pizza')
+    elif item=='idli':
+        print('Enjoy your idli')
+    elif item=='burger':
+        print('Enjoy your burger')
+    else:
+        raise ItemNotInMenuError('Item not present in menu')
+
+def main():
+    item = input()
+    menu(item)
+
+main()
+  20:13 ligh class ItemNotInMenuError(Exception): pass at the top
+  20:40 ligh else branch: raise ItemNotInMenuError('Item not present in menu')
+## S33 Custom message in the traceback [21:30 → 21:52 · 22s]
+OUT:
+C:\Users\Studio\.spyder-py3>python temp.py
+pasta
+Traceback (most recent call last):
+  File "temp.py", line 19, in <module>
+    main()
+  File "temp.py", line 17, in main
+    menu(item)
+  File "temp.py", line 13, in menu
+    raise ItemNotInMenuError('Item not present in menu')
+__main__.ItemNotInMenuError: Item not present in menu
+
+C:\Users\Studio\.spyder-py3>cls
+  21:30 ligh Cut to output; input pasta
+  21:33 ligh Traceback ends __main__.ItemNotInMenuError: Item not present in menu
+  21:43 ligh Type cls
+## S34 Handling it with try / except [21:52 → 22:47 · 55s]
+CODE:
+class ItemNotInMenuError(Exception):
+    pass
+
+
+def menu(item):
+    if item=='pizza':
+        print('Enjoy your pizza')
+    elif item=='idli':
+        print('Enjoy your idli')
+    elif item=='burger':
+        print('Enjoy your burger')
+    else:
+        raise ItemNotInMenuError('Item not present in menu')
+
+def main():
+    item = input()
+    try:
+        menu(item)
+    except ItemNotInMenuError as e:
+        print(e)
+
+main()
+  21:52 ligh main() gains try: menu(item) / except ItemNotInMenuError as e: print(e)
+  22:15 sync Presenter explains 'as e'
+## S35 Clean message, no traceback [22:47 → 23:07 · 20s]
+OUT:
+C:\Users\Studio\.spyder-py3>python temp.py
+pasta
+Item not present in menu
+
+C:\Users\Studio\.spyder-py3>
+  22:47 ligh Cut to output; input pasta
+  22:51 ligh 'Item not present in menu' prints
+  22:57 sync Hold
+## S36 Real-world case: a sign-up page [23:07 → 23:49 · 42s]
+SCR: Sign up page form: UserName, Mobile, Password fields (empty) and a Sign up button.
+  23:07 fast Orange-framed Sign up page panel slides in on the right
+## S37 Filling in the form [23:49 → 24:50 · 61s]
+SCR: Form filled in cyan text: Pythonfan / 9975268922 / **********.
+  23:49 ligh UserName: Pythonfan
+  23:55 ligh Mobile: 9975268922
+  24:00 ligh Password: ********** (masked)
+## S38 First failure: DuplicateUserError [24:50 → 25:26 · 36s]
+SCR: Form panel plus DuplicateUserError in green serif.
+  24:50 ligh Green label DuplicateUserError under the form
+## S39 Second failure: WeakPasswordError [25:26 → 26:14 · 48s]
+SCR: Form panel with both error labels stacked.
+  25:26 ligh Yellow label WeakPasswordError under DuplicateUserError
+## S40 class User [26:14 → 27:03 · 49s]
+CODE:
+class User:
+  26:14 ligh Type 'class User:'
+## S41 Class variable user_name [27:03 → 27:45 · 42s]
+CODE:
+class User:
+
+    user_name = set()
+  27:03 ligh Add user_name = set()
+## S42 Constructor stub [27:45 → 27:55 · 10s]
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,):
+  27:45 ligh Type def __init__(self,):
+## S43 Constructor parameters [27:55 → 28:07 · 12s]
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,):
+  27:55 sync Cursor waits inside the parameter list
+## S44 Storing un, mob, pwd [28:07 → 28:43 · 36s]
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+  28:07 ligh Parameters un,mob,pwd
+  28:15 ligh Three self assignments
+## S45 add_user method [28:43 → 29:54 · 71s]
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if sel
+  28:43 ligh def add_user(self):
+  29:30 ligh Start typing 'if sel'
+## S46 Is the username taken? [29:54 → 30:19 · 25s]
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name
+  29:54 ligh if self.un in User.user_name
+  30:00 ligh Teal highlight on both user_name references
+## S47 raise DuplicateUserError [30:19 → 31:25 · 66s]
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+  30:19 ligh raise DuplicateUserError('Username already exist')
+  30:30 ligh Blue selection on DuplicateUserError
+## S48 Declaring DuplicateUserError [31:25 → 31:48 · 23s]
+CODE:
+class DuplicateUserError(Exception):
+
+
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+  31:25 fast Code shifts down
+  31:30 ligh class DuplicateUserError(Exception): at the top
+## S49 Otherwise add the username [31:48 → 32:58 · 70s]
+CODE:
+class DuplicateUserError(Exception):
+    pass
+
+
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+  31:48 ligh pass under DuplicateUserError
+  32:00 ligh else: user_name.add(self.un)
+  32:30 ligh Highlight user_name; corrected to User.user_name.add(self.un)
+## S50 validate method [32:58 → 33:33 · 35s]
+CODE:
+class DuplicateUserError(Exception):
+    pass
+
+
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+  32:58 ligh def validate(self):
+## S51 Scrolling to validate [33:33 → 34:12 · 39s]
+CODE:
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+  33:33 fast Editor scrolls up; cursor in the validate body
+## S52 Counters and the loop [34:12 → 35:30 · 78s]
+CODE:
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+  34:12 ligh uc=lc=sp=num=0
+  34:40 ligh for i in self.pwd:
+## S53 Upper and lower case [35:30 → 36:19 · 49s]
+CODE:
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+  35:30 ligh if i.isupper(): uc += 1
+  35:55 ligh elif i.islower():
+## S54 Digits and special characters [36:19 → 36:59 · 40s]
+CODE:
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+  36:19 ligh lc += 1
+  36:30 ligh elif i.isdigit(): num += 1
+  36:45 ligh else: sp += 1
+## S55 Starting the strength check [36:59 → 37:20 · 21s]
+CODE:
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if
+  36:59 ligh Type 'if' below the loop
+## S56 Strength condition [37:20 → 38:43 · 83s]
+CODE:
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            ra
+  37:20 ligh if len(self.pwd)<6 or uc==0 or\
+  37:50 ligh lc==0 or num==0 or sp==0:
+  38:30 ligh Start typing 'ra'
+## S57 raise WeakPasswordError [38:43 → 39:23 · 40s]
+CODE:
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError('Pasword not strong enough')
+        else
+  38:43 ligh raise WeakPasswordError('Pasword not strong enough')
+  39:10 ligh Type 'else', later removed
+## S58 Whole class so far [39:23 → 39:36 · 13s]
+CODE:
+class DuplicateUserError(Exception):
+    pass
+
+
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+  39:23 fast Scroll to the top of the file
+## S59 Who calls add_user and validate? [39:36 → 41:04 · 88s]
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+  39:36 sync Presenter points at __init__ and the two methods
+## S60 Call both from the constructor [41:04 → 41:43 · 39s]
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+  41:04 ligh self.add_user()
+  41:15 ligh self.validate()
+## S61 main(): reading input [41:43 → 42:51 · 68s]
+CODE:
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError('Pasword not strong enough')
+
+
+def main():
+    input('Enter Username: ')
+  41:43 ligh def main(): input('Enter Username: ')
+  41:50 ligh Teal highlight on input
+## S62 main(): building the user [42:51 → 44:19 · 88s]
+CODE:
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError('Pasword not strong enough')
+
+
+def main():
+    un = input('Enter Username: ')
+    mob = int(input('Enter Mobile: '))
+    pwd = input('Enter Password: ')
+
+    u1 = User(un, mob, pwd)
+  42:51 ligh un =, mob = int(input(...)), pwd =
+  43:40 ligh u1 = User(un, mob, pwd)
+## S63 Where each error comes from [44:19 → 44:34 · 15s]
+CODE:
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+  44:19 ligh Highlight DuplicateUserError inside add_user
+## S64 Declaring WeakPasswordError [44:34 → 44:48 · 14s]
+CODE:
+class DuplicateUserError(Exception):
+    pass
+
+class WeakPasswordError(Exception):
+    pass
+
+
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError('Username already exist')
+        else:
+            User.user_name.add(self.un)
+  44:34 ligh class WeakPasswordError(Exception): pass under DuplicateUserError
+  44:38 ligh Teal highlight on the new name
+## S65 try with two specific excepts [44:48 → 46:16 · 88s]
+CODE:
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError('Pasword not strong enough')
+
+
+def main():
+    un = input('Enter Username: ')
+    mob = int(input('Enter Mobile: '))
+    pwd = input('Enter Password: ')
+
+    try:
+        u1 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    e
+  44:48 ligh try: u1 = User(un, mob, pwd)
+  45:10 ligh except DuplicateUserError as e: print(e)
+  45:40 ligh except WeakPasswordError as e: print(e)
+## S66 Generic except and else [46:16 → 47:26 · 70s]
+CODE:
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError('Pasword not strong enough')
+
+
+def main():
+    un = input('Enter Username: ')
+    mob = int(input('Enter Mobile: '))
+    pwd = input('Enter Password: ')
+
+    try:
+        u1 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print('Hey some issue occured')
+    else:
+        print('Account created successfully')
+  46:16 ligh except: print('Hey some issue occured')
+  46:45 ligh else: print('Account created successfully')
+## S67 Calling main() [47:26 → 47:44 · 18s]
+CODE:
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError('Pasword not strong enough')
+
+
+def main():
+    un = input('Enter Username: ')
+    mob = int(input('Enter Mobile: '))
+    pwd = input('Enter Password: ')
+
+    try:
+        u1 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print('Hey some issue occured')
+    else:
+        print('Account created successfully')
+
+main()
+  47:26 ligh Highlight def main and the main() call
+## S68 Memory view: main() frame [47:44 → 48:09 · 25s]
+SCR: Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box). user_name holds an empty box; the heap is empty.
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError\
+            ('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+  47:44 fast Stack, Class variable and Heap panels draw on the right
+  47:55 fast Dashed main() frame at the bottom of the stack
+## S69 Inputs land in main() [48:09 → 49:13 · 64s]
+SCR: Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box). Heap object at address 1000.
+CODE:
+                sp += 1
+
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError\
+            ('Pasword not strong enough')
+
+
+def main():
+    un = input('Enter Username: ')
+    mob = int(input('Enter Mobile: '))
+    pwd = input('Enter Password: ')
+
+    try:
+        u1 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print('Hey some issue occured')
+    else:
+        print('Account created successfully')
+  48:09 ligh main() frame: un 'Pythonfan', mob 9975268922, pwd '#rooman123'
+  48:40 fast __init__ frame opens above main(); heap object 1000 appears
+## S70 Constructor frame and self [49:13 → 49:41 · 28s]
+SCR: Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box).
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+  49:13 ligh __init__ frame: un 'Pythonfan', mob 9975268922, pwd (empty), self 1000
+  49:25 fast Dotted arrow from self to heap 1000
+## S71 The object's __dict__ [49:41 → 49:55 · 14s]
+SCR: Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box).
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+  49:41 ligh pwd '#rooman123' fills in the __init__ frame
+  49:45 fast __dict__ table with key / value headers inside heap 1000
+## S72 Attributes stored; username registered [49:55 → 51:13 · 78s]
+SCR: Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box).
+CODE:
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+  49:55 ligh __dict__ rows: un 'Pythonfan', mob 9975268922, pwd '#rooman123'
+  50:40 ligh add_user runs: 'Pythonfan' drops into class variable user_name
+## S73 validate() frame [51:13 → 52:01 · 48s]
+SCR: Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box).
+CODE:
+            ('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError\
+            ('Pasword not strong enough')
+
+
+def main():
+  51:13 fast validate() frame stacks on top
+  51:20 ligh Counters up 0, lc 0, num 0, sp 0, and self 1000
+## S74 Walking the password [52:01 → 52:43 · 42s]
+SCR: Password strip '#rooman123' with indexes 0-9 above the shrunken memory panel.
+CODE:
+            ('Username already exist')
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError\
+            ('Pasword not strong enough')
+
+
+def main():
+  52:01 fast Memory panel shrinks; pwd strip slides in on top: # r o o m a n 1 2 3, indexes 0-9
+  52:10 ligh Pointer steps per character; '#' gives sp 1, 'r' gives lc 1 (each tick snaps)
+## S75 Counts after the loop [52:43 → 53:38 · 55s]
+SCR: Password strip plus memory panel with final counters.
+CODE:
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError\
+            ('Pasword not strong enough')
+  52:43 ligh Final counters: up 0, lc 6, num 3, sp 1
+  53:00 sync Presenter checks the if: uc==0 is True
+## S76 WeakPasswordError is raised [53:38 → 54:16 · 38s]
+SCR: Red error burst labelled WeakPasswordError beside the stack.
+CODE:
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)<6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError\
+            ('Pasword not strong enough')
+  53:38 ligh Python logo and red WeakPasswordError burst over the validate() frame
+  53:50 sync Presenter explains the error travels back to main()
+## S77 Caught in main() [54:16 → 55:16 · 60s]
+SCR: Password strip and memory panel stay on the right.
+CODE:
+def main():
+    un = input('Enter Username: ')
+    mob = int(input('Enter Mobile: '))
+    pwd = input('Enter Password: ')
+
+    try:
+        u1 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print('Hey some issue occured')
+    else:
+        print('Account created successfully')
+
+main()
+  54:16 fast Code scrolls to main()
+  54:30 sync except WeakPasswordError as e: print(e) handles it
+## S78 Run the program [55:16 → 56:01 · 45s]
+OUT:
+C:\Users\Studio\.spyder-py3>
+  55:16 ligh Cut to OutputWindow with an empty prompt
+  55:38 sync Presenter sets up the duplicate-user test
+## S79 Two users with the same name [56:01 → 57:23 · 82s]
+SCR: Right side: 'pythonfan' label and un -> 'pythonfan' in a green box.
+CODE:
+def main():
+    un = input('Enter Username: ')
+    mob = int(input('Enter Mobile: '))
+    pwd = input('Enter Password: ')
+
+    try:
+        u1 = User(un, mob, pwd)
+        u2 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print('Hey some issue occured')
+    else:
+        print('Account created successfully')
+
+main()
+  56:01 ligh u2 = User(un, mob, pwd) added under u1
+  56:20 fast 'pythonfan' floats in; arrow un -> 'pythonfan' in a green box
+## S80 Output: Username already exist [57:23 → 58:01 · 38s]
+OUT:
+C:\Users\Studio\.spyder-py3>python test.py
+Enter Username: pythonfan
+Enter Mobile: 9988556622
+Enter Password: #Rooman123
+Username already exist
+
+C:\Users\Studio\.spyder-py3>
+  57:23 ligh Cut to output; python test.py
+  57:30 ligh Inputs: pythonfan / 9988556622 / #Rooman123
+  57:47 ligh Highlight 'Username already exist'
+## S81 Wrap-up [58:01 → 58:08 · 7s]
+CODE:
+def main():
+    un = input('Enter Username: ')
+    mob = int(input('Enter Mobile: '))
+    pwd = input('Enter Password: ')
+
+    try:
+        u1 = User(un, mob, pwd)
+        u2 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print('Hey some issue occured')
+    else:
+        print('Account created successfully')
+
+main()
+  58:01 sync Final main() code held while the presenter closes

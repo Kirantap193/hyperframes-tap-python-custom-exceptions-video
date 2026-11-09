@@ -1,0 +1,1561 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Custom Exceptions Storyboard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: series-matched chalkboard dark; scene cards = frame column + spec column, stacking on phones */
+:root{
+  --bg:#141619; --panel:#1b1e22; --line:#2b3036; --fg:#e9e6df; --mute:#9aa0a6;
+  --accent:#7fd3e6;   /* hierarchy-diagram cyan from the lecture */
+  --term:#58e07a;     /* output-window green */
+  --kw:#d77be0;       /* code-keyword magenta */
+  --warn:#f2c14e;
+  --serif:"Instrument Serif",Georgia,serif; --sans:Inter,system-ui,sans-serif; --mono:"JetBrains Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--sans)}
+.wrap{max-width:1180px;margin:0 auto;padding-block:40px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font:400 clamp(38px,6vw,64px)/1.02 var(--serif);margin:0;text-wrap:balance}
+h1 em{color:var(--accent)}
+.sub{color:var(--mute);max-width:68ch;margin:14px 0 0}
+.stats{display:flex;flex-wrap:wrap;gap:8px 22px;margin:18px 0 0;font-size:13px;color:var(--mute)}
+.stats b{color:var(--fg);font-variant-numeric:tabular-nums}
+.top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin:30px 0 26px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-width:0}
+.box h3{margin:0 0 10px;font:600 11px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.legend{display:grid;gap:8px;font-size:13.5px}
+.legend div{display:flex;gap:10px;align-items:baseline}
+.box ul{margin:0;padding-left:18px;font-size:13.5px;display:grid;gap:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 34px}
+.chip{font-size:12px;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:4px 10px;display:flex;gap:7px}
+.chip span{color:var(--accent);font-family:var(--mono);font-variant-numeric:tabular-nums}
+.chip:hover,.chip:focus-visible{border-color:var(--accent);outline:none}
+.scene{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:24px;padding:28px 0;border-top:1px solid var(--line);scroll-margin-top:12px}
+figure{margin:0}
+.final img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:#000}
+figcaption{font:12px var(--mono);color:var(--mute);margin-top:6px}
+.mids{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.mids img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:5px;border:1px solid var(--line);opacity:.92}
+.body{min-width:0}
+.body header{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;font-size:12px}
+.num{font:600 11px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.tr{font-family:var(--mono);color:var(--mute);font-variant-numeric:tabular-nums}
+h2{font:400 30px/1.1 var(--serif);margin:6px 0 12px;text-wrap:balance}
+.lbl{font:600 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:14px 0 6px}
+.scr{margin:0;font-size:14px}
+.pre{overflow-x:auto;background:#0e1013;border:1px solid var(--line);border-radius:7px}
+.pre pre{margin:0;padding:12px 14px;font:12.5px/1.55 var(--mono);color:#dfe3e8}
+.pre.out{background:#07120a;border-color:#1f3a26}.pre.out pre{color:var(--term)}
+.beats{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.beats li{display:grid;grid-template-columns:52px 86px minmax(0,1fr);gap:10px;align-items:baseline;font-size:13.5px}
+.beats time{font:12px var(--mono);color:var(--mute);font-variant-numeric:tabular-nums}
+.sp{font:600 10px var(--sans);letter-spacing:.08em;text-transform:uppercase;border-radius:4px;padding:3px 6px;text-align:center;border:1px solid}
+.sp.lightning{color:#1a1500;background:var(--warn);border-color:var(--warn)}
+.sp.fast{color:var(--accent);border-color:var(--accent)}
+.sp.sync{color:var(--mute);border-color:var(--line)}
+details{margin-top:14px;border-top:1px dashed var(--line);padding-top:10px}
+summary{cursor:pointer;font:600 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.narr{margin:8px 0 0;color:#cfcac0;font-size:14px;max-width:70ch}
+@media (max-width:820px){.scene,.top{grid-template-columns:minmax(0,1fr)}.beats li{grid-template-columns:46px 80px minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+html{scroll-behavior:smooth}
+</style>
+<div class="wrap">
+<h1>Custom Exceptions <em>storyboard</em></h1>
+<p class="sub">Frame-by-frame storyboard of the TAP Academy Python lecture on the exception hierarchy and user-defined exceptions: InvalidMobileNumberError, ItemNotInMenuError, DuplicateUserError and WeakPasswordError, traced through a sign-up example and the stack, heap and class-variable memory view. Each scene gives its final frame, intermediate states, timed animation order with a speed tag, the exact on-screen code and output, and the narration.</p>
+<div class="stats"><span>Complete video · <b>00:00 → 58:08</b></span><span><b>81</b> scenes</span><span><b>111</b> lightning-speed beats</span><span>TAP Academy · Python</span></div>
+<div class="top">
+<section class="box"><h3>Animation speed key</h3><div class="legend">
+<div><span class="sp lightning">lightning</span><span>Snap in at ≤150 ms, no easing. Code lines, output text, highlights, labels.</span></div>
+<div><span class="sp fast">fast</span><span>300 ms ease-out. Diagram boxes, arrows, panel swaps.</span></div>
+<div><span class="sp sync">sync</span><span>Hold or reveal on the spoken cue. Timestamps are from the source video.</span></div></div></section>
+<section class="box"><h3>Do these at ultra-lightning speed</h3><ul><li>Code: snap each new line or edit in at once. Do not replay the presenter&#x27;s live typing.</li><li>Output window: hard-cut from editor to the green terminal, then drop the whole traceback in one frame.</li><li>Highlight boxes on error lines and identifiers: on in one frame, off in one frame.</li><li>Hierarchy rows: stagger sibling boxes 60 ms apart, under 0.5 s per row.</li><li>Sign-up form values and error labels: snap in.</li><li>Memory panel: stack values, __dict__ rows and the user_name entry appear instantly.</li><li>Password walk: each pointer step and counter tick (uc / lc / num / sp) is a snap, not a count-up.</li><li>Cuts between code, output and memory views are hard cuts with no cross-fade.</li></ul></section>
+</div>
+<nav class="chips" aria-label="Scenes"><a class="chip" href="#s1"><span>00:00</span>TAP Academy opening sting</a><a class="chip" href="#s2"><span>00:08</span>Recap: the try block</a><a class="chip" href="#s3"><span>01:06</span>Valid try / except / else / finally combinations</a><a class="chip" href="#s4"><span>02:14</span>Nesting a try inside a try</a><a class="chip" href="#s5"><span>02:36</span>Exception Hierarchy: title card</a><a class="chip" href="#s6"><span>04:01</span>BaseException and Exception</a><a class="chip" href="#s7"><span>04:13</span>Second and third levels</a><a class="chip" href="#s8"><span>05:01</span>Arithmetic errors</a><a class="chip" href="#s9"><span>05:41</span>Lookup and OS errors</a><a class="chip" href="#s10"><span>07:10</span>Full hierarchy held</a><a class="chip" href="#s11"><span>07:23</span>Why we need our own exceptions</a><a class="chip" href="#s12"><span>08:22</span>Mobile-number validator raising ValueError</a><a class="chip" href="#s13"><span>08:59</span>Run: a plain ValueError</a><a class="chip" href="#s14"><span>09:49</span>Back to the code</a><a class="chip" href="#s15"><span>10:00</span>ValueError says nothing about the problem</a><a class="chip" href="#s16"><span>11:26</span>Making room for a class</a><a class="chip" href="#s17"><span>11:41</span>Naming the custom exception</a><a class="chip" href="#s18"><span>12:00</span>Inherit from Exception</a><a class="chip" href="#s19"><span>13:26</span>Replacing ValueError</a><a class="chip" href="#s20"><span>13:36</span>raise InvalidMobileNumberError</a><a class="chip" href="#s21"><span>14:03</span>Run again</a><a class="chip" href="#s22"><span>14:11</span>Traceback names the custom error</a><a class="chip" href="#s23"><span>15:09</span>Passing a message</a><a class="chip" href="#s24"><span>15:41</span>Message appears in the traceback</a><a class="chip" href="#s25"><span>16:15</span>What if the class has no parent?</a><a class="chip" href="#s26"><span>17:32</span>Plain class, no inheritance</a><a class="chip" href="#s27"><span>17:49</span>TypeError: takes no arguments</a><a class="chip" href="#s28"><span>18:08</span>Remove the message too</a><a class="chip" href="#s29"><span>18:23</span>Exceptions must derive from BaseException</a><a class="chip" href="#s30"><span>18:54</span>Example 2: a food menu</a><a class="chip" href="#s31"><span>19:39</span>Run: pasta raises NameError</a><a class="chip" href="#s32"><span>20:13</span>ItemNotInMenuError</a><a class="chip" href="#s33"><span>21:30</span>Custom message in the traceback</a><a class="chip" href="#s34"><span>21:52</span>Handling it with try / except</a><a class="chip" href="#s35"><span>22:47</span>Clean message, no traceback</a><a class="chip" href="#s36"><span>23:07</span>Real-world case: a sign-up page</a><a class="chip" href="#s37"><span>23:49</span>Filling in the form</a><a class="chip" href="#s38"><span>24:50</span>First failure: DuplicateUserError</a><a class="chip" href="#s39"><span>25:26</span>Second failure: WeakPasswordError</a><a class="chip" href="#s40"><span>26:14</span>class User</a><a class="chip" href="#s41"><span>27:03</span>Class variable user_name</a><a class="chip" href="#s42"><span>27:45</span>Constructor stub</a><a class="chip" href="#s43"><span>27:55</span>Constructor parameters</a><a class="chip" href="#s44"><span>28:07</span>Storing un, mob, pwd</a><a class="chip" href="#s45"><span>28:43</span>add_user method</a><a class="chip" href="#s46"><span>29:54</span>Is the username taken?</a><a class="chip" href="#s47"><span>30:19</span>raise DuplicateUserError</a><a class="chip" href="#s48"><span>31:25</span>Declaring DuplicateUserError</a><a class="chip" href="#s49"><span>31:48</span>Otherwise add the username</a><a class="chip" href="#s50"><span>32:58</span>validate method</a><a class="chip" href="#s51"><span>33:33</span>Scrolling to validate</a><a class="chip" href="#s52"><span>34:12</span>Counters and the loop</a><a class="chip" href="#s53"><span>35:30</span>Upper and lower case</a><a class="chip" href="#s54"><span>36:19</span>Digits and special characters</a><a class="chip" href="#s55"><span>36:59</span>Starting the strength check</a><a class="chip" href="#s56"><span>37:20</span>Strength condition</a><a class="chip" href="#s57"><span>38:43</span>raise WeakPasswordError</a><a class="chip" href="#s58"><span>39:23</span>Whole class so far</a><a class="chip" href="#s59"><span>39:36</span>Who calls add_user and validate?</a><a class="chip" href="#s60"><span>41:04</span>Call both from the constructor</a><a class="chip" href="#s61"><span>41:43</span>main(): reading input</a><a class="chip" href="#s62"><span>42:51</span>main(): building the user</a><a class="chip" href="#s63"><span>44:19</span>Where each error comes from</a><a class="chip" href="#s64"><span>44:34</span>Declaring WeakPasswordError</a><a class="chip" href="#s65"><span>44:48</span>try with two specific excepts</a><a class="chip" href="#s66"><span>46:16</span>Generic except and else</a><a class="chip" href="#s67"><span>47:26</span>Calling main()</a><a class="chip" href="#s68"><span>47:44</span>Memory view: main() frame</a><a class="chip" href="#s69"><span>48:09</span>Inputs land in main()</a><a class="chip" href="#s70"><span>49:13</span>Constructor frame and self</a><a class="chip" href="#s71"><span>49:41</span>The object&#x27;s __dict__</a><a class="chip" href="#s72"><span>49:55</span>Attributes stored; username registered</a><a class="chip" href="#s73"><span>51:13</span>validate() frame</a><a class="chip" href="#s74"><span>52:01</span>Walking the password</a><a class="chip" href="#s75"><span>52:43</span>Counts after the loop</a><a class="chip" href="#s76"><span>53:38</span>WeakPasswordError is raised</a><a class="chip" href="#s77"><span>54:16</span>Caught in main()</a><a class="chip" href="#s78"><span>55:16</span>Run the program</a><a class="chip" href="#s79"><span>56:01</span>Two users with the same name</a><a class="chip" href="#s80"><span>57:23</span>Output: Username already exist</a><a class="chip" href="#s81"><span>58:01</span>Wrap-up</a></nav>
+<article class="scene" id="s1">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s001_final.jpg" alt="Final frame of scene 1"><figcaption>Final frame · 00:06</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 01</span><span class="tr">00:00 → 00:08 · 8s</span></header>
+<h2>TAP Academy opening sting</h2><div class="lbl">On screen</div><p class="scr">Animated TAP Academy logo on a light patterned background.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>00:00</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">White patterned backdrop; blue and yellow logo bars rise</span></li><li><time>00:06</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Hard cut to the studio set</span></li></ol>
+<details open><summary>Narration · 8 words</summary><p class="narr">Namaste and welcome back to the Python class.</p></details></div></article>
+<article class="scene" id="s2">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s002_final.jpg" alt="Final frame of scene 2"><figcaption>Final frame · 01:04</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 02</span><span class="tr">00:08 → 01:06 · 58s</span></header>
+<h2>Recap: the try block</h2><div class="lbl">On screen</div><p class="scr">Heading &#x27;Valid :&#x27; in cyan, top-left. Presenter on the right.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>try :</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>00:08</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter centred; &#x27;Valid :&#x27; heading top-left</span></li><li><time>00:40</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">&#x27;try :&#x27; snaps in under the heading</span></li></ol>
+<details><summary>Narration · 164 words</summary><p class="narr">Yesterday we had looked at all the different keywords associated with exception handling such as the try, accept, else, raise and finally. Out of these keywords, you know the try is a keyword used to define a block of code called as the try block. Similarly, accept is defined or used to define a block of code called as the accept block. Similarly, you would be using else also to define a block of code and finally also does the same. Now that you know there are a total of four blocks associated in exception handling, you must know what are the valid combinations of these blocks because few are valid, few are invalid. Now, it is easier for me to show you the valid combinations than the invalid because if you know what are valid, then everything other than that naturally has to be invalid. So let us look at the valid combination, shall we? So to begin with, you know the traditional</p></details></div></article>
+<article class="scene" id="s3">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s003_final.jpg" alt="Final frame of scene 3"><figcaption>Final frame · 02:12</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 03</span><span class="tr">01:06 → 02:14 · 68s</span></header>
+<h2>Valid try / except / else / finally combinations</h2><div class="lbl">On screen</div><p class="scr">Five keyword skeletons in magenta; each body is three white bars (shown as ===). Presenter stands between columns 2 and 3.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>try :        try :        try :        try :        try :
+  ===          ===          ===          ===          ===
+except :     except :     except :     except :     finally :
+  ===          ===          ===          ===          ===
+             else :       else :       finally :
+               ===          ===          ===
+                          finally
+                            ===</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>01:06</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Column 1: try / except</span></li><li><time>01:20</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Column 2: try / except / else</span></li><li><time>01:35</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Columns 3-4: try / except / else / finally, then try / except / finally</span></li><li><time>01:55</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Column 5: try / finally</span></li></ol>
+<details><summary>Narration · 209 words</summary><p class="narr">tri block followed by the accept block is one valid combination followed by the next valid combination would be the tri block followed by the accept block followed by the else block. You know this is also a valid combination. The next valid combination obviously is your tri followed by your accept block followed by your else block and also you know there is a finally block in python and you know what to put inside each of these blocks if not go watch the video again. Now you know there is also other valid combinations this else can be skipped and you can directly have try you can have accept and you can have finally this is also valid. Also there is another interesting combination which is a try block but no accept and directly a finally block. Yes try finally is a valid combination in exception handling. I bet you didn&#x27;t know that but now you do. Not only this my friend, these valid combinations you can take and you can nest them within any of these blocks. Which means any of these valid combinations you can take and you can put it within try or within except or within else or finally. What I mean to</p></details></div></article>
+<article class="scene" id="s4">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s004_final.jpg" alt="Final frame of scene 4"><figcaption>Final frame · 02:34</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 04</span><span class="tr">02:14 → 02:36 · 22s</span></header>
+<h2>Nesting a try inside a try</h2><div class="lbl">On screen</div><p class="scr">One nested skeleton on the left; presenter points at it from the right.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>try :
+    try :
+      ===
+    except :
+      ===
+    else :
+      ===
+    finally :
+      ===
+except :
+  ===</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>02:14</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Previous columns clear</span></li><li><time>02:16</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Outer try : with an inner try / except / else / finally</span></li><li><time>02:25</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Closing outer except : snaps in</span></li></ol>
+<details open><summary>Narration · 76 words</summary><p class="narr">say is like this let us assume we are going to create a try block inside the try. You can have another try, you can have except, you can have else, you can have finally. Again, after this you can have an accept block but here all of those combinations work. Try accept you can have, try accept else you can have, try accept else finally you can have, try accept finally you can have, try</p></details></div></article>
+<article class="scene" id="s5">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s005_final.jpg" alt="Final frame of scene 5"><figcaption>Final frame · 03:59</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 05</span><span class="tr">02:36 → 04:01 · 85s</span></header>
+<h2>Exception Hierarchy: title card</h2><div class="lbl">On screen</div><p class="scr">Title &#x27;Exception Hierarchy&#x27; in cyan. Presenter centred, no diagram yet.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>02:36</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">&#x27;Exception Hierarchy&#x27; title fades in, top centre</span></li><li><time>02:40</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter introduces the built-in exception classes</span></li></ol>
+<details><summary>Narration · 253 words</summary><p class="narr">finally you can have. In other words you can nest those valid combinations inside any of these blocks. Similarly nesting can also be done inside the accept block. So this is try and inside accept you can have try, accept, else, finally and any any of those valid combinations can be nested. Similarly, another valid combination is you can be nesting it within the else block as well if you want to see. Inside the else also nesting can be done. Obviously, if in case you think you will obviously know that nesting can also be done inside the finally block. So, you can have try, you can have accept and inside the finally you can have your try, accept, else finally and any of those valid combinations. So all these are valid, just keep these in mind. If you see any other combination obviously it means they are invalid. So I hope you understood till this point of time. Now my friend I want to take you further and show you something called as the exception hierarchy. Now it&#x27;s very important to know what this exception hierarchy is. Why is that if you ask me? See, it is by understanding how the classes of exception handling have been arranged as a hierarchy. You, my friend, will be able to create something called as custom exceptions, which will play a huge part in your life as a programmer. What do I mean by this? And what is this hierarchy? Let me show you.</p></details></div></article>
+<article class="scene" id="s6">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s006_final.jpg" alt="Final frame of scene 6"><figcaption>Final frame · 04:11</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 06</span><span class="tr">04:01 → 04:13 · 12s</span></header>
+<h2>BaseException and Exception</h2><div class="lbl">On screen</div><p class="scr">Cyan-outlined boxes: BaseException (top centre), Exception (second row, left).</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>04:01</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">BaseException box at the top</span></li><li><time>04:06</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Exception box on the second level; presenter gestures to it</span></li></ol>
+<details open><summary>Narration · 33 words</summary><p class="narr">The top of the hierarchy begins with a class called as the base exception class. is the parent of all other classes. If I come one step below in the hierarchy, there are</p></details></div></article>
+<article class="scene" id="s7">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s007_final.jpg" alt="Final frame of scene 7"><figcaption>Final frame · 04:59</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 07</span><span class="tr">04:13 → 05:01 · 48s</span></header>
+<h2>Second and third levels</h2><div class="lbl">On screen</div><p class="scr">Tree grows left to right; connector lines draw from Exception down to each row-3 box.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>04:13</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Row 2: Exception, SystemExit, GeneratorExit, KeyboardInterrupt, connector up to BaseException</span></li><li><time>04:25</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Row 3 under Exception: AttributeError, ArithmeticError, EOFError, NameError, LookupError, OSError, TypeError (60 ms stagger)</span></li></ol>
+<details><summary>Narration · 137 words</summary><p class="narr">other classes such as exception, such as system exit, such as generator exit, such as keyboard interrupt. And all these have inherited from base exception. Or in other words, they have a is a relationship with base exception. You can read it like this, exception is a base exception. Any confusion to that? Now, below these classes there are other classes and And of course, I am interested only in the exception class. So I&#x27;m going to show you all the classes below exceptions because we are discussing exceptions. So please understand, below exception if you come one step below in the hierarchy, there are classes such as attribute error, such as arithmetic error, such as end of file error, such as name error, such as lookup error, such as OS error, such as your type error.</p></details></div></article>
+<article class="scene" id="s8">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s008_final.jpg" alt="Final frame of scene 8"><figcaption>Final frame · 05:39</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 08</span><span class="tr">05:01 → 05:41 · 40s</span></header>
+<h2>Arithmetic errors</h2><div class="lbl">On screen</div><p class="scr">Row 3 complete (8 boxes). The ArithmeticError branch drops three child boxes.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>05:01</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">ValueError joins the end of row 3</span></li><li><time>05:10</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Under ArithmeticError: ZeroDivisionError, FloatingPointError, OverflowError</span></li></ol>
+<details><summary>Narration · 106 words</summary><p class="narr">are many classes value error and all of them have inherited from exception. Attribute error is a exception, arithmetic error is a exception, end of file error is a exception, name error is a exception, lookup error is a exception, so on and so forth. Now, below these also few classes are there. Now, let us take arithmetic error. Below arithmetic error do few classes such as your zero division error, such as your floating point error, such as your overflow error and all of these are arithmetic errors. Zero division error is a arithmetic error because it happened due to an arithmetic operation of performing</p></details></div></article>
+<article class="scene" id="s9">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s009_final.jpg" alt="Final frame of scene 9"><figcaption>Final frame · 07:08</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 09</span><span class="tr">05:41 → 07:10 · 89s</span></header>
+<h2>Lookup and OS errors</h2><div class="lbl">On screen</div><p class="scr">Full hierarchy tree on screen.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>05:41</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Under LookupError: IndexError, KeyError</span></li><li><time>06:10</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Under OSError: FileNotFoundError, InterruptedError, PermissionError, TimeOutError</span></li></ol>
+<details><summary>Narration · 294 words</summary><p class="narr">division. Now we are able to think. Any confusion till this point of time? Similarly there are more such as if in case you were to look under lookup error you would realize that you have index error which is a lookup error, key error which is a lookup error and lookup means what you&#x27;re trying to look for an element and you know in a list or a tuple indexes are there. If you try to look up an element based on its index and if there is that index is not present you will get index error. Another lookup operation which can be performed in Python is on a dictionary using keys you can look up for a value isn&#x27;t it. Now if you give a key which is not present in the dictionary obviously key error is generated and both index error and key error is a lookup error. Lookup error is a exception, exception is a base exception. Now we are able to think. Any confusion to this point of time. So, this in essence my friend is the exception hierarchy. This is the exception hierarchy. Now similarly there is file not found error, there is interrupted error and there is permission error and all these are or timeout error all these are a type of OS error. And OS error is also an exception They happen during runtime. Again, when we do file handling, I will show you how file not found error is generated. So you will be seeing these errors as you keep coding in Python, as you keep programming more and more. But this, in general, is the exception hierarchy. See the arrangement of classes. Parent, child, age children, age children, so on and so forth.</p></details></div></article>
+<article class="scene" id="s10">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s010_final.jpg" alt="Final frame of scene 10"><figcaption>Final frame · 07:21</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 10</span><span class="tr">07:10 → 07:23 · 13s</span></header>
+<h2>Full hierarchy held</h2><div class="lbl">On screen</div><p class="scr">Complete Exception Hierarchy tree, unchanged.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>07:10</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Hold the complete tree while the presenter summarises</span></li></ol>
+<details open><summary>Narration · 24 words</summary><p class="narr">Now why this hierarchy is very, very important is because I wanted you to know that there is a parent class called as exception.</p></details></div></article>
+<article class="scene" id="s11">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s011_final.jpg" alt="Final frame of scene 11"><figcaption>Final frame · 08:20</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 11</span><span class="tr">07:23 → 08:22 · 59s</span></header>
+<h2>Why we need our own exceptions</h2><div class="lbl">On screen</div><p class="scr">Complete Exception Hierarchy tree; presenter walks in front of it.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>07:23</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Hold the tree; narration moves to custom exceptions</span></li></ol>
+<details><summary>Narration · 151 words</summary><p class="narr">And all these classes are treated as exception classes for only one reason, which is they have inherited from the exception class. In other words, any class which inherits from the exception class becomes an exception type class. its object is treated as an exception object by Python. Now if that is the case, then don&#x27;t you think I should be able to create my own class? And if my class inherits from the exception class, in a way my class is also going to be an exception type class, then the object of my class is also going to be treated as an exception object. This, my friend, is the foundation or the root of what we call as custom exceptions. Now how are we going to create custom exceptions and where are we going to use it? That is going to be the rest of the discussion. Stay focused.</p></details></div></article>
+<article class="scene" id="s12">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s012_final.jpg" alt="Final frame of scene 12"><figcaption>Final frame · 08:57</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 12</span><span class="tr">08:22 → 08:59 · 37s</span></header>
+<h2>Mobile-number validator raising ValueError</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>08:22</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Full validate(mob) and main() code snaps in</span></li><li><time>08:30</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter walks through len(mob) == 10</span></li></ol>
+<details><summary>Narration · 133 words</summary><p class="narr">Now, my friend, you realize that custom exceptions are possible in Python. But when would a programmer want to create his or her own type of exception? Let me give you an example you&#x27;re already familiar with. This was the program that we had written yesterday, right? And if in case you notice, what is this program doing? Taking input from the user, which is a mobile number, passing it to the validate function. Validate function checks if it is 10 digits. If so, it prints valid mobile number, else it raises a value error. That is all it does. But I&#x27;m asking if I execute this code and show you. I want to show you a problem with this code. Watch the output carefully and understand what I&#x27;m trying to tell you.</p></details></div></article>
+<article class="scene" id="s13">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s013_final.jpg" alt="Final frame of scene 13"><figcaption>Final frame · 09:47</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s013_m1.jpg" alt="Intermediate state at 09:05"><figcaption>09:05</figcaption></figure><figure><img loading="lazy" src="img/s013_m2.jpg" alt="Intermediate state at 09:29"><figcaption>09:29</figcaption></figure><figure><img loading="lazy" src="img/s013_m3.jpg" alt="Intermediate state at 09:41"><figcaption>09:41</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 13</span><span class="tr">08:59 → 09:49 · 50s</span></header>
+<h2>Run: a plain ValueError</h2><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;python temp.py
+99856
+Traceback (most recent call last):
+  File &quot;temp.py&quot;, line 12, in &lt;module&gt;
+    main()
+  File &quot;temp.py&quot;, line 10, in main
+    validate(mob)
+  File &quot;temp.py&quot;, line 5, in validate
+    raise ValueError
+ValueError
+
+C:\Users\Studio\.spyder-py3&gt;</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>08:59</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut to the green Matrix OutputWindow</span></li><li><time>09:05</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Input 99856</span></li><li><time>09:29</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Full traceback snaps in</span></li><li><time>09:41</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Highlight box on ValueError</span></li></ol>
+<details><summary>Narration · 174 words</summary><p class="narr">And look at it from the developer&#x27;s perspective. If I go and I just execute this piece of code, then it is going to ask me for the mobile number which is what I am going to enter now. So watch it like this if I just tell python and if in case I give the name of the file which is test or temp.py and if I press enter then it is asking me it is waiting for input I will give some input so but it is not going to be 10 digits so watch it like this if I do now there is an invalid mobile number if I press enter exception is generated and which is the exception, value error. But see, the developer who looks at this code, he&#x27;ll be like, he&#x27;ll look at the trace back and he&#x27;ll realize, oh, value error, but why? Why value error? What is the reason for value error? What is the problem with the value that I gave? He&#x27;s unable to understand.</p></details></div></article>
+<article class="scene" id="s14">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s014_final.jpg" alt="Final frame of scene 14"><figcaption>Final frame · 09:58</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 14</span><span class="tr">09:49 → 10:00 · 11s</span></header>
+<h2>Back to the code</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>09:49</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut back to code; cursor below main()</span></li></ol>
+<details open><summary>Narration · 35 words</summary><p class="narr">So if I go back to my program, what I want you to understand is, don&#x27;t you think it would be amazing if instead of value error, an exception such as invalid mobile number error</p></details></div></article>
+<article class="scene" id="s15">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s015_final.jpg" alt="Final frame of scene 15"><figcaption>Final frame · 11:24</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 15</span><span class="tr">10:00 → 11:26 · 86s</span></header>
+<h2>ValueError says nothing about the problem</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>10:00</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Hold code; presenter explains the error name is not meaningful here</span></li></ol>
+<details><summary>Narration · 254 words</summary><p class="narr">have gone generated. If invalid mobile number error was generated then reading that name of the exception itself the programmer will know oh the mobile number was invalid but unfortunately there is no such exception available in python. There is no built-in exception in python policy invalid mobile number because this is my custom requirement right different people might have different requirements, Python can&#x27;t read my mind and realize, oh, one day I would require invalid mobile number and have that as a class built into Python. No, different programmers will have different needs, different expectations. But luckily, Python has given us the ability to tweak the built-in mechanism in Python, to modify the built-in mechanism in Python and create your own exceptions and those are called as custom exceptions. Now, why is it called as custom? Custom doesn&#x27;t mean ritual here. I don&#x27;t want you to think of this as a a synonym for ritual right we are not doing some ritual here. You must understand custom here means that what is there you don&#x27;t like so you&#x27;re modifying it to your likeness and you&#x27;re using it that is the meaning of custom you bought a new car you don&#x27;t like its paint you took it to a body shop and they change the paint for you you customize the car you didn&#x27;t like its audio system you replaced it with a better system you customized it you didn&#x27;t like the interiors you didn&#x27;t like the seat cover you customized it that is</p></details></div></article>
+<article class="scene" id="s16">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s016_final.jpg" alt="Final frame of scene 16"><figcaption>Final frame · 11:39</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 16</span><span class="tr">11:26 → 11:41 · 15s</span></header>
+<h2>Making room for a class</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>
+
+def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>11:26</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Code block slides down two lines</span></li></ol>
+<details open><summary>Narration · 66 words</summary><p class="narr">the meaning of customization that I want you to understand. What was given to you? You didn&#x27;t like so you change it to your needs. Now how do we do this? Very simple. Watch it. I&#x27;m going to go to the top of my program and there I&#x27;m just going to now create a class. I&#x27;m going to create a class. I&#x27;ll call this class as</p></details></div></article>
+<article class="scene" id="s17">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s017_final.jpg" alt="Final frame of scene 17"><figcaption>Final frame · 11:58</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 17</span><span class="tr">11:41 → 12:00 · 19s</span></header>
+<h2>Naming the custom exception</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class InvalidMobileNumberError
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>11:41</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Type &#x27;class InvalidMobileNumberError&#x27; at the top</span></li></ol>
+<details open><summary>Narration · 44 words</summary><p class="narr">the invalid mobile number class like so invalid mobile number error I will call it. Let us follow the convention with Python uses. For all exceptions you know it ends with an error. So, what is it? Invalid mobile number error. I will put</p></details></div></article>
+<article class="scene" id="s18">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s018_final.jpg" alt="Final frame of scene 18"><figcaption>Final frame · 13:24</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 18</span><span class="tr">12:00 → 13:26 · 86s</span></header>
+<h2>Inherit from Exception</h2><div class="lbl">On screen</div><p class="scr">UML class diagram on the right: Exception (top) &lt;- Is-A &lt;- InvalidMobileNumberError (bottom), yellow titles, cyan outlines.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>class InvalidMobileNumberError(Exception):
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise ValueError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>12:00</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Complete &#x27;(Exception):&#x27; and &#x27;pass&#x27;</span></li><li><time>12:20</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">UML panel draws: Exception box, Is-A arrow, InvalidMobileNumberError box</span></li></ol>
+<details><summary>Narration · 240 words</summary><p class="narr">a colon. Inside I will just tell pass. Now, what I want you to understand is, if I have to represent this as a class diagram, this is that class. Invalid mobile number error. But right now, this class, if I create an object of this class, it will not be treated as an exception object. I want you to understand. It will never be treated as an exception object. Why? Because by nature it is not an exception type class. But you can make it an exception type class. How you ask me? Simple. In Python there is already a class called as the exception class. I have shown you. This class is there. As of now, this class and your class are not related to each other. Why don&#x27;t you make them related to each other? How if you ask me by making your class inherit from the exception class and you know this arrow mark represents what? Inheritance. An inheritance relationship is also referred to as is a relationship. Now read it invalid mobile number error is a exception. Would you agree with me? That is what I&#x27;m going to do. I&#x27;m going to make it inherit from the exception class like this. Now this is an exception type class. I want you to understand. So now all you have to do is when you come to the else block you want an exception to be generated</p></details></div></article>
+<article class="scene" id="s19">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s019_final.jpg" alt="Final frame of scene 19"><figcaption>Final frame · 13:34</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 19</span><span class="tr">13:26 → 13:36 · 10s</span></header>
+<h2>Replacing ValueError</h2><div class="lbl">On screen</div><p class="scr">UML diagram stays on the right.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>class InvalidMobileNumberError(Exception):
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise In
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>13:26</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Delete ValueError; type &#x27;raise In&#x27;</span></li></ol>
+<details open><summary>Narration · 29 words</summary><p class="narr">automatically Python will not generate so you are telling a race right I&#x27;ll remove this value error and instead all I&#x27;m going to do is I&#x27;m going to tell</p></details></div></article>
+<article class="scene" id="s20">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s020_final.jpg" alt="Final frame of scene 20"><figcaption>Final frame · 14:01</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 20</span><span class="tr">13:36 → 14:03 · 27s</span></header>
+<h2>raise InvalidMobileNumberError</h2><div class="lbl">On screen</div><p class="scr">UML diagram stays on the right.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>class InvalidMobileNumberError(Exception):
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise InvalidMobileNumberError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>13:36</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Line completes: raise InvalidMobileNumberError</span></li></ol>
+<details><summary>Narration · 87 words</summary><p class="narr">invalid mobile number error like this that&#x27;s it that&#x27;s all I&#x27;m going to tell any confusion to this point of time now this is also an exception type object because you only told invalid mobile number is a exception it will be generated and obviously because nobody is going to catch it here it is going to be sent to the caller which is main main is also not handling it abrupt termination will happen but look at how the output changes this time if I take</p></details></div></article>
+<article class="scene" id="s21">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s021_final.jpg" alt="Final frame of scene 21"><figcaption>Final frame · 14:09</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 21</span><span class="tr">14:03 → 14:11 · 8s</span></header>
+<h2>Run again</h2><div class="lbl">On screen</div><p class="scr">UML diagram overlays the OutputWindow on the right.</p><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;python temp.py
+9</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>14:03</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut to OutputWindow; python temp.py; typing 9</span></li></ol>
+<details open><summary>Narration · 29 words</summary><p class="narr">myself to the execution window and if in case I try to execute this piece of code then just observe it upon pressing enter mobile number invalid mobile number</p></details></div></article>
+<article class="scene" id="s22">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s022_final.jpg" alt="Final frame of scene 22"><figcaption>Final frame · 15:07</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s022_m1.jpg" alt="Intermediate state at 14:26"><figcaption>14:26</figcaption></figure><figure><img loading="lazy" src="img/s022_m2.jpg" alt="Intermediate state at 14:51"><figcaption>14:51</figcaption></figure><figure><img loading="lazy" src="img/s022_m3.jpg" alt="Intermediate state at 15:01"><figcaption>15:01</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 22</span><span class="tr">14:11 → 15:09 · 58s</span></header>
+<h2>Traceback names the custom error</h2><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;python temp.py
+99856
+Traceback (most recent call last):
+  File &quot;temp.py&quot;, line 16, in &lt;module&gt;
+    main()
+  File &quot;temp.py&quot;, line 14, in main
+    validate(mob)
+  File &quot;temp.py&quot;, line 9, in validate
+    raise InvalidMobileNumberError
+__main__.InvalidMobileNumberError
+
+C:\Users\Studio\.spyder-py3&gt;</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>14:11</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Input 99856 completes</span></li><li><time>14:26</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Traceback snaps in</span></li><li><time>14:51</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Last line __main__.InvalidMobileNumberError</span></li><li><time>15:01</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter points to the custom name</span></li></ol>
+<details><summary>Narration · 183 words</summary><p class="narr">the moment I press enter yes exception has been generated but what type of exception, invalid mobile number error. I hope you are able to think. Hence, reading this the programmer knows, oh, invalid mobile number error was the problem, fine, I will give a valid mobile number. I hope you are able to think. But, do not you think that now, if you look at it even more closely, we have told invalid mobile number, but why is the mobile number invalid? I did not tell. Why was the mobile number invalid here, because there were... it was missing 10 digits. It was lesser than 10 digits or it could be greater than 10 digits. But the 10 digits condition was missing, isn&#x27;t it? So don&#x27;t you think next to this if a message also came that ensure the mobile number is 10 digits or something like that, it would be really good and beneficial for the programmer to debug the issue. How will I get a message here, Rohit, if you ask me, simple. I&#x27;ll take myself back to my program.</p></details></div></article>
+<article class="scene" id="s23">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s023_final.jpg" alt="Final frame of scene 23"><figcaption>Final frame · 15:39</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s023_m1.jpg" alt="Intermediate state at 15:26"><figcaption>15:26</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 23</span><span class="tr">15:09 → 15:41 · 32s</span></header>
+<h2>Passing a message</h2><div class="lbl">On screen</div><p class="scr">UML diagram stays on the right.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>class InvalidMobileNumberError(Exception):
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise InvalidMobileNumberError(&#x27;Enter 10 digit mobile number&#x27;)
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>15:09</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Add (&#x27;Enter 10 digit mobile number&#x27;) to the raise</span></li><li><time>15:26</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter explains the message argument</span></li></ol>
+<details><summary>Narration · 86 words</summary><p class="narr">program, all you have to do is you told invalid mobile number error, after that I will just put parenthesis like this, watch it, I will just put parenthesis. And insert that, tell the message you want. So within quotes like this I will tell, enter a 10 digit mobile number like this, like this I will tell. Any confusion to that? Now where will this message come you might ask why are you asking me let me show you so watch it all of you</p></details></div></article>
+<article class="scene" id="s24">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s024_final.jpg" alt="Final frame of scene 24"><figcaption>Final frame · 16:13</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s024_m1.jpg" alt="Intermediate state at 15:55"><figcaption>15:55</figcaption></figure><figure><img loading="lazy" src="img/s024_m2.jpg" alt="Intermediate state at 16:01"><figcaption>16:01</figcaption></figure><figure><img loading="lazy" src="img/s024_m3.jpg" alt="Intermediate state at 16:08"><figcaption>16:08</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 24</span><span class="tr">15:41 → 16:15 · 34s</span></header>
+<h2>Message appears in the traceback</h2><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;python temp.py
+99856
+Traceback (most recent call last):
+  File &quot;temp.py&quot;, line 16, in &lt;module&gt;
+    main()
+  File &quot;temp.py&quot;, line 14, in main
+    validate(mob)
+  File &quot;temp.py&quot;, line 9, in validate
+    raise InvalidMobileNumberError(&#x27;Enter 10 digit mobile number&#x27;)
+__main__.InvalidMobileNumberError: Enter 10 digit mobile number
+
+C:\Users\Studio\.spyder-py3&gt;</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>15:41</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut to output; traceback snaps in</span></li><li><time>15:55</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Highlight &#x27;Enter 10 digit mobile number&#x27;</span></li><li><time>16:08</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Hold</span></li></ol>
+<details><summary>Narration · 107 words</summary><p class="narr">if in case I go back to my execution window and if in case I just execute this code and then if in case I give an invalid mobile number itself this time and if in case I press enter then you can notice this time along with the exception you have also got a message telling enter 10 digit mobile number do Do you see how I am customizing the mechanism of exception handling in Python according to my needs? That is why this is called as a custom exception. If I go back to my code, what is the steps to create a custom exception?</p></details></div></article>
+<article class="scene" id="s25">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s025_final.jpg" alt="Final frame of scene 25"><figcaption>Final frame · 17:30</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 25</span><span class="tr">16:15 → 17:32 · 77s</span></header>
+<h2>What if the class has no parent?</h2><div class="lbl">On screen</div><p class="scr">UML diagram still shows the Is-A link that no longer exists.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>class InvalidMobileNumberError():
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise InvalidMobileNumberError(&#x27;Enter 10 digit mobile number&#x27;)
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>16:15</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Delete &#x27;Exception&#x27;; green highlight on the empty ()</span></li><li><time>16:40</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter asks what happens now</span></li></ol>
+<details><summary>Narration · 224 words</summary><p class="narr">Very simple. Create a class and give it a suitable name. Make sure it is as per convention. As you can see, it is all in camel case. case and simple words means that the first letter of every word is capitalized. That is the meaning of camel convention. After which it must end with error because that is how python has named classes which must be treated as exception classes. Just if you tell invalid mobile number error it does not really become an exception type class. But you can make it an exception type class by making it inherit from the built-in exception class in python. Now all you have to do is wherever you want that exception to be generated just race it. It is very important that you race it because automatically Python is never going to generate that exception because Python does not know that if this condition fails it is an exception it does not know that right. So you have to race it explicitly you have to create the exception how do you explicitly create an exception by using the race keyword and be very careful. keyword can only be used with such classes objects which are exception type objects. You cannot tell race with any other class. For example, if I just go remove that exception</p></details></div></article>
+<article class="scene" id="s26">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s026_final.jpg" alt="Final frame of scene 26"><figcaption>Final frame · 17:47</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 26</span><span class="tr">17:32 → 17:49 · 17s</span></header>
+<h2>Plain class, no inheritance</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class InvalidMobileNumberError:
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise InvalidMobileNumberError(&#x27;Enter 10 digit mobile number&#x27;)
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>17:32</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Parentheses removed: class InvalidMobileNumberError:</span></li><li><time>17:35</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">UML diagram fades out</span></li></ol>
+<details open><summary>Narration · 52 words</summary><p class="narr">from here. Now that I have removed it, this is no longer an exception type class. So clearly, I am trying to raise an exception object because race is designed to only work with exception type objects. What will happen? Let us see. If in case I go and I try to</p></details></div></article>
+<article class="scene" id="s27">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s027_final.jpg" alt="Final frame of scene 27"><figcaption>Final frame · 18:06</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s027_m1.jpg" alt="Intermediate state at 17:54"><figcaption>17:54</figcaption></figure><figure><img loading="lazy" src="img/s027_m2.jpg" alt="Intermediate state at 17:59"><figcaption>17:59</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 27</span><span class="tr">17:49 → 18:08 · 19s</span></header>
+<h2>TypeError: takes no arguments</h2><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;python temp.py
+9856
+Traceback (most recent call last):
+  File &quot;temp.py&quot;, line 16, in &lt;module&gt;
+    main()
+  File &quot;temp.py&quot;, line 14, in main
+    validate(mob)
+  File &quot;temp.py&quot;, line 9, in validate
+    raise InvalidMobileNumberError(&#x27;Enter 10 digit mobile number&#x27;)
+TypeError: InvalidMobileNumberError() takes no arguments
+
+C:\Users\Studio\.spyder-py3&gt;</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>17:49</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut to output; input 9856</span></li><li><time>17:54</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Traceback snaps in</span></li><li><time>17:59</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Highlight &#x27;InvalidMobileNumberError() takes no arguments&#x27;</span></li></ol>
+<details open><summary>Narration · 67 words</summary><p class="narr">execute this piece of code, let us see what the error could be. So, I will just give an invalid mobile number, some mobile number I have given. If I press enter, then as you can see, this is the error and it is telling, hey listen, type error it seems. This invalid mobile number class takes no arguments, but you have given it arguments. Okay, fine.</p></details></div></article>
+<article class="scene" id="s28">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s028_final.jpg" alt="Final frame of scene 28"><figcaption>Final frame · 18:21</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s028_m1.jpg" alt="Intermediate state at 18:13"><figcaption>18:13</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 28</span><span class="tr">18:08 → 18:23 · 15s</span></header>
+<h2>Remove the message too</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class InvalidMobileNumberError:
+    pass
+
+
+def validate(mob):
+    if len(mob) == 10:
+        print(&#x27;Valid Mobile Number&#x27;)
+    else:
+        raise InvalidMobileNumberError
+
+
+def main():
+    mob = input()
+    validate(mob)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>18:08</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Delete the message argument</span></li><li><time>18:13</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter predicts the next error</span></li></ol>
+<details open><summary>Narration · 50 words</summary><p class="narr">Let me go back to my code and let us try to remove that arguments, which is whatever we gave in the bracket right let us remove this arguments I&#x27;ll remove this arguments fine if you think that is why error came let us see now let me try to</p></details></div></article>
+<article class="scene" id="s29">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s029_final.jpg" alt="Final frame of scene 29"><figcaption>Final frame · 18:52</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s029_m1.jpg" alt="Intermediate state at 18:37"><figcaption>18:37</figcaption></figure><figure><img loading="lazy" src="img/s029_m2.jpg" alt="Intermediate state at 18:42"><figcaption>18:42</figcaption></figure><figure><img loading="lazy" src="img/s029_m3.jpg" alt="Intermediate state at 18:47"><figcaption>18:47</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 29</span><span class="tr">18:23 → 18:54 · 31s</span></header>
+<h2>Exceptions must derive from BaseException</h2><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;python temp.py
+9856
+Traceback (most recent call last):
+  File &quot;temp.py&quot;, line 16, in &lt;module&gt;
+    main()
+  File &quot;temp.py&quot;, line 14, in main
+    validate(mob)
+  File &quot;temp.py&quot;, line 9, in validate
+    raise InvalidMobileNumberError
+TypeError: exceptions must derive from BaseException
+
+C:\Users\Studio\.spyder-py3&gt;</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>18:23</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut to output; traceback snaps in</span></li><li><time>18:37</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Last line: TypeError: exceptions must derive from BaseException</span></li><li><time>18:47</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter ties it back to the hierarchy</span></li></ol>
+<details><summary>Narration · 84 words</summary><p class="narr">execute and see if I go back and if in case I re-execute this code and if I give an invalid mobile number then if I press enter look at the exception carefully type error you got and what is it saying exceptions must derive from base exception. It is trying to tell, listen, you&#x27;re trying to raise an exception but the class is not an exception type class because it has not derived from base exception. How we&#x27;re able to think? So if</p></details></div></article>
+<article class="scene" id="s30">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s030_final.jpg" alt="Final frame of scene 30"><figcaption>Final frame · 19:37</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 30</span><span class="tr">18:54 → 19:39 · 45s</span></header>
+<h2>Example 2: a food menu</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>def menu(item):
+    if item==&#x27;pizza&#x27;:
+        print(&#x27;Enjoy your pizza&#x27;)
+    elif item==&#x27;idli&#x27;:
+        print(&#x27;Enjoy your idli&#x27;)
+    elif item==&#x27;burger&#x27;:
+        print(&#x27;Enjoy your burger&#x27;)
+    else:
+        raise NameError
+
+def main():
+    item = input()
+    menu(item)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>18:54</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">menu(item) function and main() snap in</span></li><li><time>19:10</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter reads the pizza / idli / burger branches</span></li></ol>
+<details><summary>Narration · 166 words</summary><p class="narr">I go back to my code, the only way to do this is I will undo all the changes that I have done which is nothing but I will give the message and most importantly it should derive from exception. Any confusion till this point of time. Great! One more example that we did yesterday if I convert and show you more clarity you will get. So the next example is the same code which we had previously written and this was the program if you remember wherein we were taking input which is a food item from the user and just passing it to the menu function. Menu function was checking whether it exists in the menu and if it is not pizza idli or burger we were raising name error. Name name error is a built-in exception in Python. But watch it. If I execute this piece of code, what I want you to understand is look at it again from the developer&#x27;s perspective.</p></details></div></article>
+<article class="scene" id="s31">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s031_final.jpg" alt="Final frame of scene 31"><figcaption>Final frame · 20:11</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s031_m1.jpg" alt="Intermediate state at 19:48"><figcaption>19:48</figcaption></figure><figure><img loading="lazy" src="img/s031_m2.jpg" alt="Intermediate state at 20:01"><figcaption>20:01</figcaption></figure><figure><img loading="lazy" src="img/s031_m3.jpg" alt="Intermediate state at 20:07"><figcaption>20:07</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 31</span><span class="tr">19:39 → 20:13 · 34s</span></header>
+<h2>Run: pasta raises NameError</h2><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;python temp.py
+pasta
+Traceback (most recent call last):
+  File &quot;temp.py&quot;, line 15, in &lt;module&gt;
+    main()
+  File &quot;temp.py&quot;, line 13, in main
+    menu(item)
+  File &quot;temp.py&quot;, line 9, in menu
+    raise NameError
+NameError
+
+C:\Users\Studio\.spyder-py3&gt;</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>19:39</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut to output; input pasta</span></li><li><time>19:48</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Traceback snaps in</span></li><li><time>20:01</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Highlight NameError</span></li></ol>
+<details><summary>Narration · 107 words</summary><p class="narr">So I will just go, and if in case I key in the command and I press Enter, and I give something, pasta, I will give, which is not there. If I press Enter, then you can notice, name error you have got. But then the developer will be thinking, hey, why name error? Is there something wrong with the name pasta? But don&#x27;t you think if this error was item not in menu error, then he would have understood? Clearly he would have understood? Then you must customize the exception mechanism because there is no exception built into Python called as item not in menu error.</p></details></div></article>
+<article class="scene" id="s32">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s032_final.jpg" alt="Final frame of scene 32"><figcaption>Final frame · 21:28</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 32</span><span class="tr">20:13 → 21:30 · 77s</span></header>
+<h2>ItemNotInMenuError</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class ItemNotInMenuError(Exception):
+    pass
+
+
+def menu(item):
+    if item==&#x27;pizza&#x27;:
+        print(&#x27;Enjoy your pizza&#x27;)
+    elif item==&#x27;idli&#x27;:
+        print(&#x27;Enjoy your idli&#x27;)
+    elif item==&#x27;burger&#x27;:
+        print(&#x27;Enjoy your burger&#x27;)
+    else:
+        raise ItemNotInMenuError(&#x27;Item not present in menu&#x27;)
+
+def main():
+    item = input()
+    menu(item)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>20:13</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">class ItemNotInMenuError(Exception): pass at the top</span></li><li><time>20:40</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">else branch: raise ItemNotInMenuError(&#x27;Item not present in menu&#x27;)</span></li></ol>
+<details><summary>Narration · 222 words</summary><p class="narr">But we can create it. How? Just go on top, and I will have to create my own class. And I&#x27;m going to create this class, call this class as item not in menu error and following camel convention see item not in menu error n should be small error like this any confusion to this point of time tell me if you just do this much will it become an exception type class no because right now this is just a normal class if you want this to be an exception type class there is the built-in exception class in Python you must make it in head how will we do that simple I will go there and I&#x27;m going to tell exception like this. That&#x27;s it. Now I&#x27;m going to come here and instead of raising name error, I will raise my error, my exception which is item not in menu error like this. Any confusion till this point of time? Great. But we also would like a message isn&#x27;t it? So I&#x27;ll just put brackets here and within the parenthesis I will just tell item not present in menu. Not present in menu like this. As simple as that. Any confusion? Now let me execute and show you how things would be changing. So watch it all of you.</p></details></div></article>
+<article class="scene" id="s33">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s033_final.jpg" alt="Final frame of scene 33"><figcaption>Final frame · 21:50</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s033_m1.jpg" alt="Intermediate state at 21:33"><figcaption>21:33</figcaption></figure><figure><img loading="lazy" src="img/s033_m2.jpg" alt="Intermediate state at 21:38"><figcaption>21:38</figcaption></figure><figure><img loading="lazy" src="img/s033_m3.jpg" alt="Intermediate state at 21:43"><figcaption>21:43</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 33</span><span class="tr">21:30 → 21:52 · 22s</span></header>
+<h2>Custom message in the traceback</h2><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;python temp.py
+pasta
+Traceback (most recent call last):
+  File &quot;temp.py&quot;, line 19, in &lt;module&gt;
+    main()
+  File &quot;temp.py&quot;, line 17, in main
+    menu(item)
+  File &quot;temp.py&quot;, line 13, in menu
+    raise ItemNotInMenuError(&#x27;Item not present in menu&#x27;)
+__main__.ItemNotInMenuError: Item not present in menu
+
+C:\Users\Studio\.spyder-py3&gt;cls</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>21:30</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut to output; input pasta</span></li><li><time>21:33</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Traceback ends __main__.ItemNotInMenuError: Item not present in menu</span></li><li><time>21:43</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Type cls</span></li></ol>
+<details open><summary>Narration · 63 words</summary><p class="narr">Like this if I go and if in case I just try to execute it and give pasta then the moment I press enter what you have got is item not in menu error and the message is item not present Now we know so pasta is not there. Let me try idli, pizza or burger. I hope you are able to think.</p></details></div></article>
+<article class="scene" id="s34">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s034_final.jpg" alt="Final frame of scene 34"><figcaption>Final frame · 22:45</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 34</span><span class="tr">21:52 → 22:47 · 55s</span></header>
+<h2>Handling it with try / except</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class ItemNotInMenuError(Exception):
+    pass
+
+
+def menu(item):
+    if item==&#x27;pizza&#x27;:
+        print(&#x27;Enjoy your pizza&#x27;)
+    elif item==&#x27;idli&#x27;:
+        print(&#x27;Enjoy your idli&#x27;)
+    elif item==&#x27;burger&#x27;:
+        print(&#x27;Enjoy your burger&#x27;)
+    else:
+        raise ItemNotInMenuError(&#x27;Item not present in menu&#x27;)
+
+def main():
+    item = input()
+    try:
+        menu(item)
+    except ItemNotInMenuError as e:
+        print(e)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>21:52</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">main() gains try: menu(item) / except ItemNotInMenuError as e: print(e)</span></li><li><time>22:15</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter explains &#x27;as e&#x27;</span></li></ol>
+<details><summary>Narration · 217 words</summary><p class="narr">Amazing isn&#x27;t it? So I hope you got an understanding of custom exceptions and please understand if you don&#x27;t want abrupt termination to happen you can handle it. How if you ask me? See when you race it, it comes to the main. Main is not catching it isn&#x27;t it? Let&#x27;s try to make main catch it. We can prevent abrupt termination. Now if you ask me I will just come and I will press enter, tell try and I will push this within the try block. within the try block and then I will just tell accept. You can tell generic accept or specific also maybe I will tell specifically itself accept like this and what is the exception item not in menu error like this I will get any confusion and maybe what I will do is I will give it a reference I will tell as maybe e like this any confusion then I will come inside and I will just tell print e. If I do not print e whatever is the message here I will get it there any confusion but the beauty of it is abrupt domination does not happen. So watch it all of you. If in case I go back and if in case I try to execute this</p></details></div></article>
+<article class="scene" id="s35">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s035_final.jpg" alt="Final frame of scene 35"><figcaption>Final frame · 23:05</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s035_m1.jpg" alt="Intermediate state at 22:51"><figcaption>22:51</figcaption></figure><figure><img loading="lazy" src="img/s035_m2.jpg" alt="Intermediate state at 22:57"><figcaption>22:57</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 35</span><span class="tr">22:47 → 23:07 · 20s</span></header>
+<h2>Clean message, no traceback</h2><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;python temp.py
+pasta
+Item not present in menu
+
+C:\Users\Studio\.spyder-py3&gt;</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>22:47</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut to output; input pasta</span></li><li><time>22:51</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">&#x27;Item not present in menu&#x27; prints</span></li><li><time>22:57</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Hold</span></li></ol>
+<details open><summary>Narration · 63 words</summary><p class="narr">piece of code, watch it. Upon keying in the relevant command, pressing Enter, giving pasta, the moment I press Enter, it will execute like this item not present in menu. As you can see, what is executed is the accept block of the main function. So I hope custom exceptions are clear to you. Now let us take a scenario-based program and see</p></details></div></article>
+<article class="scene" id="s36">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s036_final.jpg" alt="Final frame of scene 36"><figcaption>Final frame · 23:47</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 36</span><span class="tr">23:07 → 23:49 · 42s</span></header>
+<h2>Real-world case: a sign-up page</h2><div class="lbl">On screen</div><p class="scr">Sign up page form: UserName, Mobile, Password fields (empty) and a Sign up button.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>23:07</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Orange-framed Sign up page panel slides in on the right</span></li></ol>
+<details><summary>Narration · 109 words</summary><p class="narr">how we can start thinking in terms of creating custom exceptions. So my friend now it&#x27;s time for us to take a scenario and understand how custom exceptions can be a beautiful concept and can solve many problems for you. Let us assume this is the case. Assume there is an application which has a signup page like this. And the fields in the signup page to create an account in this application is username mobile password. three fields the user has to give and click on sign up and account is created. It could be anything. It could be email application, a social media application or LMS application.</p></details></div></article>
+<article class="scene" id="s37">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s037_final.jpg" alt="Final frame of scene 37"><figcaption>Final frame · 24:48</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 37</span><span class="tr">23:49 → 24:50 · 61s</span></header>
+<h2>Filling in the form</h2><div class="lbl">On screen</div><p class="scr">Form filled in cyan text: Pythonfan / 9975268922 / **********.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>23:49</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">UserName: Pythonfan</span></li><li><time>23:55</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Mobile: 9975268922</span></li><li><time>24:00</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Password: ********** (masked)</span></li></ol>
+<details><summary>Narration · 177 words</summary><p class="narr">It&#x27;s just a sign up page which is commonly available in all kinds of web applications that you see. But let us assume like this a user goes and enters some details like this. Python fan is the user name, this is the mobile number and this is the password. Now, what I am trying to tell you is there are few conditions which every signup page imposes on their users. Let us assume in my signup page, first and foremost, this username cannot be a duplicate username, which means to say that if in case somebody has already created a username called as pythonfan, another user should not be able to sign up using the same credentials and same details. Would you agree with me? Now if someone attempts to create a username with the same name as what someone else has created, then that is a logical mistake according to me and I want an exception to be generated. But I think you already know very very well that Python is never going to automatically</p></details></div></article>
+<article class="scene" id="s38">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s038_final.jpg" alt="Final frame of scene 38"><figcaption>Final frame · 25:24</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 38</span><span class="tr">24:50 → 25:26 · 36s</span></header>
+<h2>First failure: DuplicateUserError</h2><div class="lbl">On screen</div><p class="scr">Form panel plus DuplicateUserError in green serif.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>24:50</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Green label DuplicateUserError under the form</span></li></ol>
+<details><summary>Narration · 111 words</summary><p class="narr">generate an exception. Why would it? How does Python know that if at all there is a duplicate username it should raise an exception? Python doesn&#x27;t know. But the beautiful part is that We can customize the mechanism of exception handling and create our own exception. And let us assume if a duplicate user name is given, I want an exception to be generated called as duplicate user error. This exception should be generated. Similarly, there is another restriction which I&#x27;m giving. That is for password. See, when it comes to password, I don&#x27;t want the password to be a weak password because then it is susceptible to being hacked, right?</p></details></div></article>
+<article class="scene" id="s39">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s039_final.jpg" alt="Final frame of scene 39"><figcaption>Final frame · 26:12</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 39</span><span class="tr">25:26 → 26:14 · 48s</span></header>
+<h2>Second failure: WeakPasswordError</h2><div class="lbl">On screen</div><p class="scr">Form panel with both error labels stacked.</p>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>25:26</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Yellow label WeakPasswordError under DuplicateUserError</span></li></ol>
+<details><summary>Narration · 151 words</summary><p class="narr">That is why all these different companies come up with different restrictions for the password. Now, the restrictions for my password are simple. The password must be minimum six characters long. It should have at least one upper case letter in it. It should have at least one lower case letter in it. And definitely, it should have a special character and it should have a number. Minimum one of these should be there and minimum six characters long it should be. If this condition is not satisfied, then an exception should be generated and obviously Python would not generate it, but I will customize it in such a way that the moment this condition is not satisfied, a weak password error gets generated like this. Any confusion till this point of time? Now how are we going to write code for this is what I am trying to show you.</p></details></div></article>
+<article class="scene" id="s40">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s040_final.jpg" alt="Final frame of scene 40"><figcaption>Final frame · 27:01</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 40</span><span class="tr">26:14 → 27:03 · 49s</span></header>
+<h2>class User</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>26:14</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Type &#x27;class User:&#x27;</span></li></ol>
+<details><summary>Narration · 155 words</summary><p class="narr">So let us start by writing the code. So watch it all of you. thing that I want to do is I am going to create a class called as user like this. I&#x27;ll create a class, I&#x27;ll call this class as the user class. Any confusion to hear? Next what I&#x27;m going to do is inside that user class I told you user names must be exclusive, must be unique. How will we track whether the user names are unique or not? Well if you know the set concept in Python it&#x27;s very simple. Tell me can set store duplicates? No, isn&#x27;t it? Keep this at the back of your mind. I&#x27;ll come inside the class and as a class variable, I don&#x27;t want this to be an instance variable. As a class variable, I&#x27;m going to create a set and how will you create an empty set in Python? By telling set function</p></details></div></article>
+<article class="scene" id="s41">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s041_final.jpg" alt="Final frame of scene 41"><figcaption>Final frame · 27:43</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 41</span><span class="tr">27:03 → 27:45 · 42s</span></header>
+<h2>Class variable user_name</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>27:03</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Add user_name = set()</span></li></ol>
+<details><summary>Narration · 124 words</summary><p class="narr">like this. I hope you remember because if you open bracket, close bracket, curly braces, automatically just treat it as a dictionary. Remember your concepts, right? This set, I will call it as user name like this. Any confusion? Every time a new user is created, a new user object is created, I will take that user name and put it inside the set because you know anyways the set can only store unique values, duplicates will automatically be removed. Any confusion till this point of time? Now watch it my friend. Now I have to create the instance variables which I want for my user object and that can be created within a class inside the magic method called as the dunder init.</p></details></div></article>
+<article class="scene" id="s42">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s042_final.jpg" alt="Final frame of scene 42"><figcaption>Final frame · 27:53</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 42</span><span class="tr">27:45 → 27:55 · 10s</span></header>
+<h2>Constructor stub</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,):</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>27:45</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Type def __init__(self,):</span></li></ol>
+<details open><summary>Narration · 26 words</summary><p class="narr">So I will define the dunder init and being an instance method first argument is always self so I will tell self inside of it. Wonderful.</p></details></div></article>
+<article class="scene" id="s43">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s043_final.jpg" alt="Final frame of scene 43"><figcaption>Final frame · 28:05</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 43</span><span class="tr">27:55 → 28:07 · 12s</span></header>
+<h2>Constructor parameters</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,):</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>27:55</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Cursor waits inside the parameter list</span></li></ol>
+<details open><summary>Narration · 34 words</summary><p class="narr">Next what I am going to do is I will also be collecting some arguments inside init. What are the arguments? If you recollect there were three things you should collect username, mobile, password.</p></details></div></article>
+<article class="scene" id="s44">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s044_final.jpg" alt="Final frame of scene 44"><figcaption>Final frame · 28:41</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 44</span><span class="tr">28:07 → 28:43 · 36s</span></header>
+<h2>Storing un, mob, pwd</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>28:07</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Parameters un,mob,pwd</span></li><li><time>28:15</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Three self assignments</span></li></ol>
+<details><summary>Narration · 111 words</summary><p class="narr">So for that, UN is going to be the variable for username, PWD or mobile, MOB is going to be for mobile and for password I will tell PWD like this. Great, wonderful. I will come to the next slide. In the next line what I am going to do is, I now am going to create the instance variables. How will you do that? Simple. Self.UN equal to UN, I will tell you. In other words, whatever is there in this local variable UN, I am assigning it to the instance variable UN. I will tell self.mob equal to mob like this. Similarly, I will tell self.pwd equal to pwd</p></details></div></article>
+<article class="scene" id="s45">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s045_final.jpg" alt="Final frame of scene 45"><figcaption>Final frame · 29:52</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 45</span><span class="tr">28:43 → 29:54 · 71s</span></header>
+<h2>add_user method</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if sel</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>28:43</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">def add_user(self):</span></li><li><time>29:30</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Start typing &#x27;if sel&#x27;</span></li></ol>
+<details><summary>Narration · 207 words</summary><p class="narr">like this. Any confusion to this point of time? Wonderful. That takes care of my dunder in it. Now, I want to create a method and the name of this method is going to be the add user method, which is going to take these credentials and add it as a user, right? So what will this addUser method do? I want you to think. I will define the addUser method. And this is going to be an instance method, so I will be, a self is going to be my first argument. I will come inside this and basically what I will be doing is first and foremost, the concept says or the scenario says that the user name must be unique. Would you agree with me? All I will do is, I will go to this set and I will check if this user already exists. If that username already exists in my set, then I know it is a duplicate user. How will you do that, sir? Simple. Watch it. I will just tell if in case. Now username is inside which variable? UN. This is an instance variable. Instance variable can only be accessed using self. So I will tell self.UN like this.</p></details></div></article>
+<article class="scene" id="s46">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s046_final.jpg" alt="Final frame of scene 46"><figcaption>Final frame · 30:17</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 46</span><span class="tr">29:54 → 30:19 · 25s</span></header>
+<h2>Is the username taken?</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>29:54</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">if self.un in User.user_name</span></li><li><time>30:00</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Teal highlight on both user_name references</span></li></ol>
+<details open><summary>Narration · 68 words</summary><p class="narr">I will tell because in is used for membership check in which set in my set call as username but tell me look at this what type of variable is username instance or class variable class variable class variables are always access using the class name so like this I will just tell the class name which is user dot username I will tell any confusion till this</p></details></div></article>
+<article class="scene" id="s47">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s047_final.jpg" alt="Final frame of scene 47"><figcaption>Final frame · 31:23</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 47</span><span class="tr">30:19 → 31:25 · 66s</span></header>
+<h2>raise DuplicateUserError</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>30:19</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">raise DuplicateUserError(&#x27;Username already exist&#x27;)</span></li><li><time>30:30</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Blue selection on DuplicateUserError</span></li></ol>
+<details><summary>Narration · 175 words</summary><p class="narr">point of time I will put a colon if it is there then it means that it is a duplicate user name. If it is a duplicate user name, then I know that I must be generating an exception. Which exception? Duplicate user error. But will Python generate that? No, we should generate it. And how will the programmer explicitly create an exception? Simple, race I will tell you. Any confusion develop? Or race what? I will tell weak or duplicate user error like this I will duplicate user error. Also I want a message to be generated so I will put within bracket like this I will tell a message and the message can be something like username already exists or something like this user already exists username already exists you can tell username already exists and and that is what I should also be telling you know. Now you might ask sir but where is this class correct I have not created it so I&#x27;ll go on top and I&#x27;m just going to</p></details></div></article>
+<article class="scene" id="s48">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s048_final.jpg" alt="Final frame of scene 48"><figcaption>Final frame · 31:46</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 48</span><span class="tr">31:25 → 31:48 · 23s</span></header>
+<h2>Declaring DuplicateUserError</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class DuplicateUserError(Exception):
+
+
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>31:25</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Code shifts down</span></li><li><time>31:30</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">class DuplicateUserError(Exception): at the top</span></li></ol>
+<details><summary>Narration · 84 words</summary><p class="narr">create a class called as duplicate user error like this and if you have understood the previous concept well you know very very well that just by creating a class whose name ends with error it has become an exception type class you must make it an exception type class by inheriting it from the exception class and how will you do it prove brackets and make it inherit from exception. That&#x27;s it. Inside that, I will just tell pass. Any confusion till this</p></details></div></article>
+<article class="scene" id="s49">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s049_final.jpg" alt="Final frame of scene 49"><figcaption>Final frame · 32:56</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 49</span><span class="tr">31:48 → 32:58 · 70s</span></header>
+<h2>Otherwise add the username</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class DuplicateUserError(Exception):
+    pass
+
+
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>31:48</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">pass under DuplicateUserError</span></li><li><time>32:00</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">else: user_name.add(self.un)</span></li><li><time>32:30</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Highlight user_name; corrected to User.user_name.add(self.un)</span></li></ol>
+<details><summary>Narration · 210 words</summary><p class="narr">point of time, dear friend? Great. So now not only have you created a custom exception class, you have also raised a custom exception and this is the custom message. Else, I will come. Else means what, my friend? That this user name was not there in my set, which means it is unique, it is new, it is not already present. If that is the case, then I am going to take that username and I want to add it to my set called as username. So that next time if somebody tries to create a duplicate username, I will be able to find it in my set. So all I am going to do is, you know how to add to a set name, which is username, user underscore name, then followed by dot add function is there. And what to add? What to add is whatever is a username. And how do you access the username? name is the instance variable self.UN like this. Any confusion till this point of time? Also you know that user name is a class variable. Being a class variable you should always access it using the class name just the way here you are told. So I will tell user.user name</p></details></div></article>
+<article class="scene" id="s50">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s050_final.jpg" alt="Final frame of scene 50"><figcaption>Final frame · 33:31</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 50</span><span class="tr">32:58 → 33:33 · 35s</span></header>
+<h2>validate method</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class DuplicateUserError(Exception):
+    pass
+
+
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>32:58</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">def validate(self):</span></li></ol>
+<details><summary>Narration · 119 words</summary><p class="narr">like this. Any confusion till this point of time? Wonderful. Next what you might ask? Next what means? Now I will come below. One more method I would like to create. Which Which is that method if you ask me? This method is going to be the validate method. Why is this called as a validate method? Because it is going to validate whether my password is a strong password or a weak password. So, I will just define a method and I will call this method as validate like this. And this is also instance method. So, self I will tell. After which inside this I am going to come and I will just scroll it a little</p></details></div></article>
+<article class="scene" id="s51">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s051_final.jpg" alt="Final frame of scene 51"><figcaption>Final frame · 34:10</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 51</span><span class="tr">33:33 → 34:12 · 39s</span></header>
+<h2>Scrolling to validate</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>33:33</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Editor scrolls up; cursor in the validate body</span></li></ol>
+<details><summary>Narration · 115 words</summary><p class="narr">bit on top. Inside this validate all I&#x27;m going to do is simple. I&#x27;m going to first check for my condition. Again I repeat. My first condition is the length should be minimum six characters. My second condition is there should be one upper case, one lower case, one special character, one digit. So how am I going to check all this? First I&#x27;m going to create few variables my friend. I&#x27;m going to create a variable called as UC for upper case, LC for lower case, SP for special character and D for digit like this or NUM I can call it as whatever I want. So like this I will create my variables</p></details></div></article>
+<article class="scene" id="s52">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s052_final.jpg" alt="Final frame of scene 52"><figcaption>Final frame · 35:28</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 52</span><span class="tr">34:12 → 35:30 · 78s</span></header>
+<h2>Counters and the loop</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>34:12</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">uc=lc=sp=num=0</span></li><li><time>34:40</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">for i in self.pwd:</span></li></ol>
+<details><summary>Narration · 244 words</summary><p class="narr">watch it and see how I&#x27;m going to create it I will tell UC equal to LC equal to SP equal to maybe whatever it is for digit which is num like this and then Then I will tell equal to 0. What is this line if you ask me? I am initializing all four variables to 0 at the same time. This is one of the things which you can also start implementing. So I have initialized everything with 0. Why have I done this? Simple. I will tell you. Anyways, I will come below. Now, I have to check whether the password matches these conditions, isn&#x27;t it? Now where is my password? My password is inside an instance variable called as pwd. So see what I am going to do. I&#x27;m going to run a for loop on this password. So like this, I will tell for I in self.pwd. And you know, string is an iterable 100% you can have a for loop on it. Character by character you will get every time I will get one character. All I&#x27;m going to do is I will check if that character is uppercase or lowercase or is it a special character or is it a digit? If it is lowercase I will increment LC, if it is upper case I will increment UC, if it is a digit I will increment num, if it is a special character I will increment SP.</p></details></div></article>
+<article class="scene" id="s53">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s053_final.jpg" alt="Final frame of scene 53"><figcaption>Final frame · 36:17</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 53</span><span class="tr">35:30 → 36:19 · 49s</span></header>
+<h2>Upper and lower case</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>35:30</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">if i.isupper(): uc += 1</span></li><li><time>35:55</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">elif i.islower():</span></li></ol>
+<details><summary>Narration · 145 words</summary><p class="narr">How are you going to check growth whether it is lowercase or upper case? Built-in methods of string are there. How if you ask me I will come inside. I&#x27;ll tell if in case I dot is maybe upper like this I will check is upper. Any confusion to learn? Now is upper method will check if that character is upper case. If it is upper case colon I will put I will come inside increment the value of upper case by 1. Any confusion till here? I will come below. Next I will check else if i dot is slower I will check is slower method is also there we have explored all this if in case you guys recollect and then if this is true then I will enter this if block and there I will increment the lower case value by 1.</p></details></div></article>
+<article class="scene" id="s54">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s054_final.jpg" alt="Final frame of scene 54"><figcaption>Final frame · 36:57</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 54</span><span class="tr">36:19 → 36:59 · 40s</span></header>
+<h2>Digits and special characters</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>36:19</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">lc += 1</span></li><li><time>36:30</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">elif i.isdigit(): num += 1</span></li><li><time>36:45</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">else: sp += 1</span></li></ol>
+<details><summary>Narration · 120 words</summary><p class="narr">Similarly, Lf again I will tell and this time I am going to check if in case it is a digit how is digit method is there i.isDigit I will tell any confusion next I will come below and I will increment num by 1 because you know it is a digit. So, num plus equal to 1 you know this is a shortcut operator great else I will tell. If it is none of these characters it&#x27;s not a upper case not a lower case it is not a digit means it&#x27;s a special character so just directly I will increment the special character value by one. Wonderful. At the end of this for loop my uclc, sp and</p></details></div></article>
+<article class="scene" id="s55">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s055_final.jpg" alt="Final frame of scene 55"><figcaption>Final frame · 37:18</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 55</span><span class="tr">36:59 → 37:20 · 21s</span></header>
+<h2>Starting the strength check</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>36:59</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Type &#x27;if&#x27; below the loop</span></li></ol>
+<details open><summary>Narration · 81 words</summary><p class="narr">num variables would have got different values right. Now I can check my condition for whether it is a weak password or not. How do I check that simple? I&#x27;ll be like if in case right. I&#x27;ll come below I&#x27;ll put one more condition. See this is outside the for loop. Leave one more line space. I will tell if in case, scroll it a little bit on top. Yeah. I will, all that I will do is I will tell</p></details></div></article>
+<article class="scene" id="s56">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s056_final.jpg" alt="Final frame of scene 56"><figcaption>Final frame · 38:41</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 56</span><span class="tr">37:20 → 38:43 · 83s</span></header>
+<h2>Strength condition</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            ra</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>37:20</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">if len(self.pwd)&lt;6 or uc==0 or\</span></li><li><time>37:50</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">lc==0 or num==0 or sp==0:</span></li><li><time>38:30</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Start typing &#x27;ra&#x27;</span></li></ol>
+<details><summary>Narration · 213 words</summary><p class="narr">if in case first length, length of password, how to access password? self.pwd. It&#x27;s an instance variable. Right? Is less than 6. This is the first condition which should never be not followed or I will tell the next condition. Upper case, u c is equal to 0. 0 means it means that not even one upper case is there or l c equal to 0 means not even one lower case is there or I will tell n u m equal to 0, which means not even one digit is there or I will tell maybe s p equal to 0, which means not even one special character is there that is what it means. Any confusion to there? And again I will just put a slash somewhere and bring it to the next line so that you know we have sufficient space to also trace the program. So somewhere you can just put a slash. Yeah. Any confusion to there? Now if this is the case I will come inside and this is a weak password. If it is a weak password you must be racing an exception. Which exception should you be racing? You should be racing an exception called as the weak password error. That&#x27;s what I will do.</p></details></div></article>
+<article class="scene" id="s57">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s057_final.jpg" alt="Final frame of scene 57"><figcaption>Final frame · 39:21</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 57</span><span class="tr">38:43 → 39:23 · 40s</span></header>
+<h2>raise WeakPasswordError</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError(&#x27;Pasword not strong enough&#x27;)
+        else</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>38:43</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">raise WeakPasswordError(&#x27;Pasword not strong enough&#x27;)</span></li><li><time>39:10</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Type &#x27;else&#x27;, later removed</span></li></ol>
+<details><summary>Narration · 100 words</summary><p class="narr">I will tell race and I will tell weak password error like this. Right? Also custom message I want. So I will tell that password not strong enough. Strong enough I will tell you. Any confusion teller? Wonderful. Else, right? So if this condition is perfect then what I am going to do is I will come to else and I will or there is no requirement for else because the only thing that was needed here was for you to validate and yes you have validated it. So I will just remove this else. Else is not required. Only</p></details></div></article>
+<article class="scene" id="s58">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s058_final.jpg" alt="Final frame of scene 58"><figcaption>Final frame · 39:34</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 58</span><span class="tr">39:23 → 39:36 · 13s</span></header>
+<h2>Whole class so far</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class DuplicateUserError(Exception):
+    pass
+
+
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>39:23</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Scroll to the top of the file</span></li></ol>
+<details open><summary>Narration · 51 words</summary><p class="narr">if none of this condition is satisfied you should print this message. There is no else part required here at all. Any confusion till this point of time dear friend? Great. So if I scroll up, now where is this weak password error? That is the class we should be creating.</p></details></div></article>
+<article class="scene" id="s59">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s059_final.jpg" alt="Final frame of scene 59"><figcaption>Final frame · 41:02</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 59</span><span class="tr">39:36 → 41:04 · 88s</span></header>
+<h2>Who calls add_user and validate?</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>39:36</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter points at __init__ and the two methods</span></li></ol>
+<details><summary>Narration · 263 words</summary><p class="narr">So I&#x27;ll go on top and I&#x27;ll just copy this weak password. I&#x27;ll just scroll and I&#x27;ll create one class and I will call this class as the weak password error class. Wonderful. You know you must make it into an exception class, inherited from exception. Now it&#x27;s an exception type class. Pass, I will write syntax expectation of Python. If I scroll down, now you know, you are racing a custom exception. Scroll down, you are racing a custom exception. And yes, this is an exception because weak password is an exception you have only told. Any confusion till this point of time? Now, now, if I scroll a little bit on top, what you must understand about this user class is when somebody creates an object of this class, right, when somebody creates an object of this class. Passes user name, passes mobile, passes password. Then automatically I want add user and validate to be called automatically. The moment object is created automatically these two methods should be called. Now how will you design the code such that automatically the methods are called simple. Think about it when an object is created which amongst these three methods will be called by Python automatically. Obviously it is the magic method under init. So whenever init is called, inside init if I call add user and validate then don&#x27;t you think the moment a user object is created automatically add user and validate also will be called? How will you do it? Simple. I will go inside and init and tell me self</p></details></div></article>
+<article class="scene" id="s60">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s060_final.jpg" alt="Final frame of scene 60"><figcaption>Final frame · 41:41</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 60</span><span class="tr">41:04 → 41:43 · 39s</span></header>
+<h2>Call both from the constructor</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>41:04</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">self.add_user()</span></li><li><time>41:15</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">self.validate()</span></li></ol>
+<details><summary>Narration · 118 words</summary><p class="narr">is nothing a reference to the object. I will tell self which is nothing but the object dot and I will call add user. As simple as that. Great. Similarly, next line, I will tell self.validate. Did you see how easily you can be calling these functions from inside init? That is why inside every instance variable you have self so that you have access to the object. Any confusion till this point of time I hope it is crystal clear for all of you. This is the class user and of course exception classes also. Two classes I have created, three classes are there but program will not execute because we have not created the main so</p></details></div></article>
+<article class="scene" id="s61">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s061_final.jpg" alt="Final frame of scene 61"><figcaption>Final frame · 42:49</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 61</span><span class="tr">41:43 → 42:51 · 68s</span></header>
+<h2>main(): reading input</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError(&#x27;Pasword not strong enough&#x27;)
+
+
+def main():
+    input(&#x27;Enter Username: &#x27;)</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>41:43</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">def main(): input(&#x27;Enter Username: &#x27;)</span></li><li><time>41:50</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Teal highlight on input</span></li></ol>
+<details><summary>Narration · 192 words</summary><p class="narr">So I will scroll down and I am going to define my main method here. So I will define main and inside the main all I am going to do is, I am now going to take input from the user. What are the three inputs you know? One is the user name, second is the mobile, third is the password. So I will call the input function and the input function I will just ask, you know, enter the user name like this. But in a real life web application, this details will be collected by the front end, will be collected by the HTML page. Technically we call it as forms, right? If in case after this course you have taken up the full stack development which is using Django and HTML and CSS etc. There you would see how this data can be collected from a website from the front end and how it can be passed to python. But because we have not discussed how to create front ends and merge the front end and back end together, I am just asking input from the keyboard. So anyways,</p></details></div></article>
+<article class="scene" id="s62">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s062_final.jpg" alt="Final frame of scene 62"><figcaption>Final frame · 44:17</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 62</span><span class="tr">42:51 → 44:19 · 88s</span></header>
+<h2>main(): building the user</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError(&#x27;Pasword not strong enough&#x27;)
+
+
+def main():
+    un = input(&#x27;Enter Username: &#x27;)
+    mob = int(input(&#x27;Enter Mobile: &#x27;))
+    pwd = input(&#x27;Enter Password: &#x27;)
+
+    u1 = User(un, mob, pwd)</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>42:51</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">un =, mob = int(input(...)), pwd =</span></li><li><time>43:40</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">u1 = User(un, mob, pwd)</span></li></ol>
+<details><summary>Narration · 261 words</summary><p class="narr">I will collect this in a variable and I will call it as UN like this. Any confusion to this point of time? Wonderful. Next, I am going to just duplicate this line and there I will make it as enter mobile number like this or enter mobile I will tell sufficient I will store it in a variable and I will call that variable as maybe mob like this. Anyways, mobile number it is better it remains an integer so I will just type cast it and make it an integer. Great, next what you might ask. Now next what I am going to be essentially doing is I am now going to also be taking the input this time I am going to be taking the password. I will just tell like this enter password and w and there I will remove this type cast to integer because password is a string. Any confusion to learn? I will store it in a variable called as pwd. Great! Now it is time for me to create the user object using whatever details he has given. So I will leave one more line of space and I will create the user object like this and then when I create the user object brackets I will put and there I will pass you, you and mobile password. I will give a reference to this, I will call it as u1. Now you must understand the moment you create a user object, one method automatically gets called which is that dunder in it.</p></details></div></article>
+<article class="scene" id="s63">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s063_final.jpg" alt="Final frame of scene 63"><figcaption>Final frame · 44:32</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 63</span><span class="tr">44:19 → 44:34 · 15s</span></header>
+<h2>Where each error comes from</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>44:19</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Highlight DuplicateUserError inside add_user</span></li></ol>
+<details open><summary>Narration · 37 words</summary><p class="narr">Scroll on top, dunder in it gets called. Any confusion to that? Dunder init in turn will call add user, will in turn will call validate. And if you notice add user may generate duplicate user error.</p></details></div></article>
+<article class="scene" id="s64">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s064_final.jpg" alt="Final frame of scene 64"><figcaption>Final frame · 44:46</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 64</span><span class="tr">44:34 → 44:48 · 14s</span></header>
+<h2>Declaring WeakPasswordError</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>class DuplicateUserError(Exception):
+    pass
+
+class WeakPasswordError(Exception):
+    pass
+
+
+class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError(&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>44:34</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">class WeakPasswordError(Exception): pass under DuplicateUserError</span></li><li><time>44:38</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Teal highlight on the new name</span></li></ol>
+<details open><summary>Narration · 48 words</summary><p class="narr">Validate may generate your weak password error. So they might race it. If they race it and they don&#x27;t catch it, it will come to the caller. Who is the caller of these two methods? Ultimately it is main, it is init. Who is the caller of init?</p></details></div></article>
+<article class="scene" id="s65">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s065_final.jpg" alt="Final frame of scene 65"><figcaption>Final frame · 46:14</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 65</span><span class="tr">44:48 → 46:16 · 88s</span></header>
+<h2>try with two specific excepts</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError(&#x27;Pasword not strong enough&#x27;)
+
+
+def main():
+    un = input(&#x27;Enter Username: &#x27;)
+    mob = int(input(&#x27;Enter Mobile: &#x27;))
+    pwd = input(&#x27;Enter Password: &#x27;)
+
+    try:
+        u1 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    e</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>44:48</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">try: u1 = User(un, mob, pwd)</span></li><li><time>45:10</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">except DuplicateUserError as e: print(e)</span></li><li><time>45:40</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">except WeakPasswordError as e: print(e)</span></li></ol>
+<details><summary>Narration · 282 words</summary><p class="narr">The caller of init is main. and tell me, in main are you catching it? No. If you don&#x27;t, abrupt domination will happen. Which means this is a line which is very risky, may generate an exception. So better put it within, try accept. So I will just enclose this within, try like this. Any confusion? Next, I will come to accept and in accept, multiple exceptions may come. So I am going to create specific accept blocks. One accept block is going to catch only the duplicate user error. So like this I will tell duplicate user error like this. Any confusion till here? And maybe I will give it a reference as e I will call it as. And inside this I just want a message whatever is the default message I will print it. How to do it? Print e I will tell and this I have already shown you previously how this works. Any confusion? Next specific accept block I will create. In that I am just going to tell maybe weak password error that is the second type of exception which may happen and that also I will give it a reference as E and I will just print the default message wherein I will get this password not strong enough if in case it generates any confusion next what you might ask next what means you know specific handlers you must give but if at all an exception which you could not predict which you could not account for generates then again abrupt termination happen so please provide that final safety net which is your generic catcher So, like this I will tell accept that&#x27;s it.</p></details></div></article>
+<article class="scene" id="s66">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s066_final.jpg" alt="Final frame of scene 66"><figcaption>Final frame · 47:24</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 66</span><span class="tr">46:16 → 47:26 · 70s</span></header>
+<h2>Generic except and else</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError(&#x27;Pasword not strong enough&#x27;)
+
+
+def main():
+    un = input(&#x27;Enter Username: &#x27;)
+    mob = int(input(&#x27;Enter Mobile: &#x27;))
+    pwd = input(&#x27;Enter Password: &#x27;)
+
+    try:
+        u1 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print(&#x27;Hey some issue occured&#x27;)
+    else:
+        print(&#x27;Account created successfully&#x27;)</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>46:16</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">except: print(&#x27;Hey some issue occured&#x27;)</span></li><li><time>46:45</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">else: print(&#x27;Account created successfully&#x27;)</span></li></ol>
+<details><summary>Narration · 174 words</summary><p class="narr">And inside that I will just tell print, maybe hey some issue occurred like this, because I only don&#x27;t know what is the issue, some issue occurred. Any confusion till this point of time? Great. Now, if no exception occurs in the tri-block, then there is a block in exception handling Inside which you can put such statements which will only execute if no exception occurs within the try. Which is that block and you recollect? Else block. So I will put else. Why are you putting else if you ask me? Only if no exception occurs here, it means successfully user was created, isn&#x27;t it? So inside else I will just tell print, account created successfully. I will tell you. Like this. Account created successfully. Any confusion till here? So that is what should happen. No exception means account was created successfully. Great. I hope you&#x27;re able to think. This is my program, my dear friends. Will it execute? No. Why? You wouldn&#x27;t call me in. So let us call me in outside.</p></details></div></article>
+<article class="scene" id="s67">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s067_final.jpg" alt="Final frame of scene 67"><figcaption>Final frame · 47:42</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 67</span><span class="tr">47:26 → 47:44 · 18s</span></header>
+<h2>Calling main()</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError(&#x27;Pasword not strong enough&#x27;)
+
+
+def main():
+    un = input(&#x27;Enter Username: &#x27;)
+    mob = int(input(&#x27;Enter Mobile: &#x27;))
+    pwd = input(&#x27;Enter Password: &#x27;)
+
+    try:
+        u1 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print(&#x27;Hey some issue occured&#x27;)
+    else:
+        print(&#x27;Account created successfully&#x27;)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>47:26</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Highlight def main and the main() call</span></li></ol>
+<details open><summary>Narration · 53 words</summary><p class="narr">If you want to put that condition, if in case, dunder name, but I&#x27;m just going to directly call me in. Because I know by now all of you have become experts. Any confusion till here? here. Now how does this program work is what I want to trace and show you. Let&#x27;s</p></details></div></article>
+<article class="scene" id="s68">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s068_final.jpg" alt="Final frame of scene 68"><figcaption>Final frame · 48:07</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 68</span><span class="tr">47:44 → 48:09 · 25s</span></header>
+<h2>Memory view: main() frame</h2><div class="lbl">On screen</div><p class="scr">Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box). user_name holds an empty box; the heap is empty.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()
+
+    def add_user(self):
+        if self.un in User.user_name:
+            raise DuplicateUserError\
+            (&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>47:44</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Stack, Class variable and Heap panels draw on the right</span></li><li><time>47:55</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Dashed main() frame at the bottom of the stack</span></li></ol>
+<details><summary>Narration · 94 words</summary><p class="narr">look at that. Now it is time for us to trace the program. You know a few segments are required, stack heap and the class variable section. You know there is a class variable in the user class which is a set by the name of username and obviously memory is allocated for it in the class variable section. Great! The first method to be called here is the main method. This is its stack frame. Now if I scroll down to main you would notice what are we doing in main. In main</p></details></div></article>
+<article class="scene" id="s69">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s069_final.jpg" alt="Final frame of scene 69"><figcaption>Final frame · 49:11</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 69</span><span class="tr">48:09 → 49:13 · 64s</span></header>
+<h2>Inputs land in main()</h2><div class="lbl">On screen</div><p class="scr">Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box). Heap object at address 1000.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>                sp += 1
+
+        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError\
+            (&#x27;Pasword not strong enough&#x27;)
+
+
+def main():
+    un = input(&#x27;Enter Username: &#x27;)
+    mob = int(input(&#x27;Enter Mobile: &#x27;))
+    pwd = input(&#x27;Enter Password: &#x27;)
+
+    try:
+        u1 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print(&#x27;Hey some issue occured&#x27;)
+    else:
+        print(&#x27;Account created successfully&#x27;)</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>48:09</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">main() frame: un &#x27;Pythonfan&#x27;, mob 9975268922, pwd &#x27;#rooman123&#x27;</span></li><li><time>48:40</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">__init__ frame opens above main(); heap object 1000 appears</span></li></ol>
+<details><summary>Narration · 211 words</summary><p class="narr">essentially we are now taking input from the user. Username, mobile, password storing it in UN, mob and pwd. So obviously that is what I&#x27;m showing you. Let us assume like this username is python fan and mobile is this and password is this. Any confusion? If you look at this password you can immediately identify that it doesn&#x27;t satisfy my criteria because your special character is there? Yes lowercase is there, yes digit is there but what is not there is an upper case character. So let us see how this program works. Anyways, when I come to this line what is happening is I am creating an object of the user class. Now you know the dunder in it and all gets called every time I do not have to speak about it. You also know that the dunder new method also gets called every time I do not have to talk about it. So directly I am going to start like this wherein a brand new block of memory is allocated and what is being called is my dunder init method right and in init method you know the first argument is always going to be self because as you can see if I scroll up to the</p></details></div></article>
+<article class="scene" id="s70">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s070_final.jpg" alt="Final frame of scene 70"><figcaption>Final frame · 49:39</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 70</span><span class="tr">49:13 → 49:41 · 28s</span></header>
+<h2>Constructor frame and self</h2><div class="lbl">On screen</div><p class="scr">Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box).</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>49:13</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">__init__ frame: un &#x27;Pythonfan&#x27;, mob 9975268922, pwd (empty), self 1000</span></li><li><time>49:25</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Dotted arrow from self to heap 1000</span></li></ol>
+<details><summary>Narration · 88 words</summary><p class="narr">init method this is how the init method looks first argument is self. Now what will be there in self if you ask me like this the address of the object comes and sits which means I have got a reference to the object. Now there are three local variables UN, MOB, PWD. And what this UN, PWD will do is it will collect whatever is there in this. So UN will get python fan and then MOB will get this mobile number and then PWD is going</p></details></div></article>
+<article class="scene" id="s71">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s071_final.jpg" alt="Final frame of scene 71"><figcaption>Final frame · 49:53</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 71</span><span class="tr">49:41 → 49:55 · 14s</span></header>
+<h2>The object&#x27;s __dict__</h2><div class="lbl">On screen</div><p class="scr">Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box).</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>49:41</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">pwd &#x27;#rooman123&#x27; fills in the __init__ frame</span></li><li><time>49:45</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">__dict__ table with key / value headers inside heap 1000</span></li></ol>
+<details open><summary>Narration · 64 words</summary><p class="narr">to get this password. So I think this is clear by now for all of you. The next three lines. What are you trying to do? You are adding these as instance variables. Instance variables in python is technically stored in the form of a dictionary called as dunderdict. So this is only by dunderdict and you know these are stored as key value</p></details></div></article>
+<article class="scene" id="s72">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s072_final.jpg" alt="Final frame of scene 72"><figcaption>Final frame · 51:11</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 72</span><span class="tr">49:55 → 51:13 · 78s</span></header>
+<h2>Attributes stored; username registered</h2><div class="lbl">On screen</div><p class="scr">Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box).</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>class User:
+
+    user_name = set()
+
+    def __init__(self,un,mob,pwd):
+        self.un = un
+        self.mob = mob
+        self.pwd = pwd
+        self.add_user()
+        self.validate()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>49:55</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">__dict__ rows: un &#x27;Pythonfan&#x27;, mob 9975268922, pwd &#x27;#rooman123&#x27;</span></li><li><time>50:40</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">add_user runs: &#x27;Pythonfan&#x27; drops into class variable user_name</span></li></ol>
+<details><summary>Narration · 201 words</summary><p class="narr">pairs. Wonderful. Now in the next slide I&#x27;m telling self.adduser I&#x27;m calling this is only adduser which means immediately one more stack frame gets created for adduser. This is only self 1000 comes and sits it is referring to this. Great. Enter. self.un see self.un python is it there in my set called as username? No. If it is not there it means it is not already present which means if condition doesn&#x27;t satisfy, exception will not be generated and yes it shouldn&#x27;t be generated because there is no duplicate user error here because this is a unique user. Control comes to else and in else what am I doing? I am taking that self.un which is a username and I&#x27;m adding it to my class variable which is a set called as username and obviously python fan gets added there like this. Any confusion till this point of time? Awesome. Now control of add user is done. Add user has fulfilled its duty. Its stack frame gets deleted like this. Control comes back to init and in init till here execution is over. Next is going to validate. So if I just scroll down to validate a little bit so</p></details></div></article>
+<article class="scene" id="s73">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s073_final.jpg" alt="Final frame of scene 73"><figcaption>Final frame · 51:59</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 73</span><span class="tr">51:13 → 52:01 · 48s</span></header>
+<h2>validate() frame</h2><div class="lbl">On screen</div><p class="scr">Memory panel on the right: Stack (blue frame), Class variable user_name (green box), Heap (yellow box).</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>            (&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError\
+            (&#x27;Pasword not strong enough&#x27;)
+
+
+def main():</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>51:13</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">validate() frame stacks on top</span></li><li><time>51:20</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Counters up 0, lc 0, num 0, sp 0, and self 1000</span></li></ol>
+<details><summary>Narration · 142 words</summary><p class="narr">that you can see it correctly, this is only that validate function, right? So the moment you call it, its stack frame gets created like this. Self is the first argument even invalidate I will get a reference to this dictionary. Great. Next what? Next what means there are four local variables I&#x27;m creating. UC LC SP NUM all are initialized to zero that is what I&#x27;m trying to show you. This is UP which is initialized to zero and that is LC which is initialized to zero and obviously you have SP and NUM as well which is what I am just showing like this. Any confusion to that? Great. Now focus and listen carefully. I am running a for loop on self.pwd. self.pwd means that password. That is a string. On the string I&#x27;m running a for loop, isn&#x27;t it?</p></details></div></article>
+<article class="scene" id="s74">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s074_final.jpg" alt="Final frame of scene 74"><figcaption>Final frame · 52:41</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 74</span><span class="tr">52:01 → 52:43 · 42s</span></header>
+<h2>Walking the password</h2><div class="lbl">On screen</div><p class="scr">Password strip &#x27;#rooman123&#x27; with indexes 0-9 above the shrunken memory panel.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>            (&#x27;Username already exist&#x27;)
+        else:
+            User.user_name.add(self.un)
+
+    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError\
+            (&#x27;Pasword not strong enough&#x27;)
+
+
+def main():</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>52:01</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Memory panel shrinks; pwd strip slides in on top: # r o o m a n 1 2 3, indexes 0-9</span></li><li><time>52:10</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Pointer steps per character; &#x27;#&#x27; gives sp 1, &#x27;r&#x27; gives lc 1 (each tick snaps)</span></li></ol>
+<details><summary>Narration · 126 words</summary><p class="narr">So let me just bring that as a reference for you. Let us assume this is only that string, that password string. And the same password which is hashtag room and 123 is what is there in this. Now watch it. I will now begin my for loop. I begins from the first character. And you know the first character, what is the type of the first character tell me? If I check is I upper? No. Come down. Is I lower? No. Come down. Is I digit? No. Which means come to else. It&#x27;s a special character. Increment the value of SP by 1 like this. SP becomes 1. Next I am within a loop, I moves forward. If I moves forward you know this</p></details></div></article>
+<article class="scene" id="s75">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s075_final.jpg" alt="Final frame of scene 75"><figcaption>Final frame · 53:36</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 75</span><span class="tr">52:43 → 53:38 · 55s</span></header>
+<h2>Counts after the loop</h2><div class="lbl">On screen</div><p class="scr">Password strip plus memory panel with final counters.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError\
+            (&#x27;Pasword not strong enough&#x27;)</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>52:43</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Final counters: up 0, lc 6, num 3, sp 1</span></li><li><time>53:00</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter checks the if: uc==0 is True</span></li></ol>
+<details><summary>Narration · 149 words</summary><p class="narr">is a lowercase character. So, see LC incremented because this condition will not be satisfied, this condition will be satisfied LC increments. Similarly, when the loop iterates and moves forward this is also lowercase character it increments. Lowercase character LC increments, lowercase character LC increments, lowercase character LC increments, lowercase character LC increments lowercase character LC increments and now it is a digit which means NUM increments see is digit would have got satisfied I will move ahead again this increments I will move ahead again this increments because they&#x27;re all numbers at the end of the loop UP is still zero because there is not a single uppercase character there not a single uppercase character then what happens you might ask. Then what happens means come down. You are checking for a condition. Is length of the password less than 6? I mean that condition is not true</p></details></div></article>
+<article class="scene" id="s76">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s076_final.jpg" alt="Final frame of scene 76"><figcaption>Final frame · 54:14</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 76</span><span class="tr">53:38 → 54:16 · 38s</span></header>
+<h2>WeakPasswordError is raised</h2><div class="lbl">On screen</div><p class="scr">Red error burst labelled WeakPasswordError beside the stack.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>    def validate(self):
+        uc=lc=sp=num=0
+        for i in self.pwd:
+            if i.isupper():
+                uc += 1
+            elif i.islower():
+                lc += 1
+            elif i.isdigit():
+                num += 1
+            else:
+                sp += 1
+
+        if len(self.pwd)&lt;6 or uc==0 or\
+        lc==0 or num==0 or sp==0:
+            raise WeakPasswordError\
+            (&#x27;Pasword not strong enough&#x27;)</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>53:38</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Python logo and red WeakPasswordError burst over the validate() frame</span></li><li><time>53:50</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter explains the error travels back to main()</span></li></ol>
+<details><summary>Narration · 121 words</summary><p class="narr">it is false because clearly it is greater than 6. But as you can see you see is it equal to 0? Oh yes. Even if one of the condition satisfies because it is or if anything is true the entire expression is true I will come inside if and I&#x27;m going to erase which type of exception? Weak password error and you know the moment that happens this validate is now going to generate the weak password error give it to the interpreter. Now interpreter will check inside validate is there any try except no. Okay next it will at least come to the caller which is init. Tell me inside init is there any try except block if I</p></details></div></article>
+<article class="scene" id="s77">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s077_final.jpg" alt="Final frame of scene 77"><figcaption>Final frame · 55:14</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 77</span><span class="tr">54:16 → 55:16 · 60s</span></header>
+<h2>Caught in main()</h2><div class="lbl">On screen</div><p class="scr">Password strip and memory panel stay on the right.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>def main():
+    un = input(&#x27;Enter Username: &#x27;)
+    mob = int(input(&#x27;Enter Mobile: &#x27;))
+    pwd = input(&#x27;Enter Password: &#x27;)
+
+    try:
+        u1 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print(&#x27;Hey some issue occured&#x27;)
+    else:
+        print(&#x27;Account created successfully&#x27;)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>54:16</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">Code scrolls to main()</span></li><li><time>54:30</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">except WeakPasswordError as e: print(e) handles it</span></li></ol>
+<details><summary>Narration · 192 words</summary><p class="narr">scroll on top definitely not there is no try except block which means it has no other option but to come down to main if I scroll down to main watch it all of you if I just scroll down to main then in main is there a try accept yes in fact there is specific accept to catch this type of exception and hence this guy is going to come down to main give it to the accept block and when it gives it to the accept block what is going to catch it is this accept block and there you&#x27;re going to get the message that password is not strong enough any confusion and now exception occurred obviously none of these except blocks will execute definitely else will not execute because else will execute if only and only if there is not a single exception which was occurring inside the tri block. So was password successfully created? No it was unsuccessful. Would you agree with me? So that is what we should also be getting. So let me execute and show this code for you. If I take myself to</p></details></div></article>
+<article class="scene" id="s78">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s078_final.jpg" alt="Final frame of scene 78"><figcaption>Final frame · 55:59</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s078_m1.jpg" alt="Intermediate state at 55:22"><figcaption>55:22</figcaption></figure><figure><img loading="lazy" src="img/s078_m2.jpg" alt="Intermediate state at 55:38"><figcaption>55:38</figcaption></figure><figure><img loading="lazy" src="img/s078_m3.jpg" alt="Intermediate state at 55:43"><figcaption>55:43</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 78</span><span class="tr">55:16 → 56:01 · 45s</span></header>
+<h2>Run the program</h2><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>55:16</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut to OutputWindow with an empty prompt</span></li><li><time>55:38</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Presenter sets up the duplicate-user test</span></li></ol>
+<details><summary>Narration · 125 words</summary><p class="narr">the execution window and if in case I put the relevant command and I press enter then watch it username it is asking. Python fan I will give. Next I&#x27;ll press enter. I will give a mobile number some 10 digit mobile number. Great. Next it is going to ask me for the password. I&#x27;m going to give the password which is hashtag room and 123 like this. N A A N I will give. Any confusion to The moment I press enter, you can notice you have got password not strong enough, which means weak password exception was generated. How cool is this? Let me also show you how this code would work if in case I were to generate the duplicate user error.</p></details></div></article>
+<article class="scene" id="s79">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s079_final.jpg" alt="Final frame of scene 79"><figcaption>Final frame · 57:21</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 79</span><span class="tr">56:01 → 57:23 · 82s</span></header>
+<h2>Two users with the same name</h2><div class="lbl">On screen</div><p class="scr">Right side: &#x27;pythonfan&#x27; label and un -&gt; &#x27;pythonfan&#x27; in a green box.</p><div class="lbl">On-screen code</div><div class="pre"><pre><code>def main():
+    un = input(&#x27;Enter Username: &#x27;)
+    mob = int(input(&#x27;Enter Mobile: &#x27;))
+    pwd = input(&#x27;Enter Password: &#x27;)
+
+    try:
+        u1 = User(un, mob, pwd)
+        u2 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print(&#x27;Hey some issue occured&#x27;)
+    else:
+        print(&#x27;Account created successfully&#x27;)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>56:01</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">u2 = User(un, mob, pwd) added under u1</span></li><li><time>56:20</time><span class="sp fast" title="Fast · 300 ms">fast</span><span class="bt">&#x27;pythonfan&#x27; floats in; arrow un -&gt; &#x27;pythonfan&#x27; in a green box</span></li></ol>
+<details><summary>Narration · 269 words</summary><p class="narr">Now watch it my friends. To show you when this duplicate user error will happen, all I will do is, I have created a user object using the username, mobile and password given by the user. What if I try to create one more user object with the same detail? So watch it, I&#x27;ll duplicate this line. And all I&#x27;m going to do is I&#x27;ll give it a new reference called as u2 like this. Now what I want you to understand is, when this first object was created, you know my set username already had the username pythonfan. It already had it. The second time when I create this user object, scroll on top, Obviously init method will be called, all that username, password, mobile will be created inside that dictionary. I don&#x27;t have to show you everything that trace you already know it. All I&#x27;m saying is add user gets called. If I come to add user, I&#x27;m checking if that username which is python fan, is it there in my set caller&#x27;s username? Yes, it is already there. If it is there, condition is true, I will enter the if block and once I enter, I am erasing the duplicate user error. any confusion till here. Obviously this error will be generated and if I scroll down this will be now coming down to main. In main this EXA block is going to catch it and there I am going to get the relevant message. Will this happen? Let me execute and show you. So watch it all of you if I take myself to the</p></details></div></article>
+<article class="scene" id="s80">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s080_final.jpg" alt="Final frame of scene 80"><figcaption>Final frame · 57:59</figcaption></figure>
+<div class="mids"><figure><img loading="lazy" src="img/s080_m1.jpg" alt="Intermediate state at 57:30"><figcaption>57:30</figcaption></figure><figure><img loading="lazy" src="img/s080_m2.jpg" alt="Intermediate state at 57:47"><figcaption>57:47</figcaption></figure><figure><img loading="lazy" src="img/s080_m3.jpg" alt="Intermediate state at 57:52"><figcaption>57:52</figcaption></figure></div></div>
+<div class="body"><header><span class="num">Scene 80</span><span class="tr">57:23 → 58:01 · 38s</span></header>
+<h2>Output: Username already exist</h2><div class="lbl">Output window</div><div class="pre out"><pre><code>C:\Users\Studio\.spyder-py3&gt;python test.py
+Enter Username: pythonfan
+Enter Mobile: 9988556622
+Enter Password: #Rooman123
+Username already exist
+
+C:\Users\Studio\.spyder-py3&gt;</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>57:23</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Cut to output; python test.py</span></li><li><time>57:30</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Inputs: pythonfan / 9988556622 / #Rooman123</span></li><li><time>57:47</time><span class="sp lightning" title="Lightning · ≤150 ms snap">lightning</span><span class="bt">Highlight &#x27;Username already exist&#x27;</span></li></ol>
+<details><summary>Narration · 110 words</summary><p class="narr">execution window and if I just execute this piece of code and if in case I give python fan and if in case I give some 10 digit mobile number Also, if in case I give hashtag Roman123 as the password and if in case, so give small r, okay, I will give capital R because I do not want the weak password exception to be generated. So, I am giving uppercase. If in case I press enter, you can notice you have got username already exists. So, perfectly the code works. I hope you will find more use cases for such kind of custom exceptions and also make sure</p></details></div></article>
+<article class="scene" id="s81">
+<div class="media"><figure class="final"><img loading="lazy" src="img/s081_final.jpg" alt="Final frame of scene 81"><figcaption>Final frame · 58:06</figcaption></figure>
+</div>
+<div class="body"><header><span class="num">Scene 81</span><span class="tr">58:01 → 58:08 · 7s</span></header>
+<h2>Wrap-up</h2><div class="lbl">On-screen code</div><div class="pre"><pre><code>def main():
+    un = input(&#x27;Enter Username: &#x27;)
+    mob = int(input(&#x27;Enter Mobile: &#x27;))
+    pwd = input(&#x27;Enter Password: &#x27;)
+
+    try:
+        u1 = User(un, mob, pwd)
+        u2 = User(un, mob, pwd)
+    except DuplicateUserError as e:
+        print(e)
+    except WeakPasswordError as e:
+        print(e)
+    except:
+        print(&#x27;Hey some issue occured&#x27;)
+    else:
+        print(&#x27;Account created successfully&#x27;)
+
+main()</code></pre></div>
+<div class="lbl">Animation order</div><ol class="beats"><li><time>58:01</time><span class="sp sync" title="Sync · timed to narration">sync</span><span class="bt">Final main() code held while the presenter closes</span></li></ol>
+<details open><summary>Narration · 18 words</summary><p class="narr">you do the coding assignments so that you can deepen your knowledge. Catch you on the other side.</p></details></div></article>
+</div>
+
+</body></html>

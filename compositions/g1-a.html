@@ -1,0 +1,123 @@
+<template id="g1-a-template">
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .g1-sl { position: absolute; overflow: hidden; }
+    .g1-sl img { position: absolute; top: 0; display: block; }
+  </style>
+  <div data-hf-id="hf-n5x7" id="root" data-composition-id="g1-a" data-width="1920" data-height="1080" data-duration="30.3"></div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="assets/kit.js"></script>
+  <script src="assets/cx.js"></script>
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      var root = document.querySelector('[data-composition-id="g1-a"]');
+      var k = K.make(root, tl);
+      var BEAT = window.__g1aBeats = {};
+      function ex(o) { o.immediateRender = false; return o; }
+      var L = k.layer({ x: 0, y: 56, w: 1920, h: 1080 });          // true frame coordinates
+
+      // ===== S02 heading: the user's "Validate:" lettering, top-left, rains in letter by letter =====
+      // the slices are windows onto ONE image, so the landed word is the artwork pixel for pixel
+      var IW = 1985, IH = 667, DW = 480, sc = DW / IW, HX = 34, HY = -32;
+      var CUT = [150, 425, 640, 748, 830, 1060, 1285, 1445, 1695, 1985];
+      var slices = [];
+      for (var i = 0; i < CUT.length - 1; i++) {
+        var x0 = Math.round(CUT[i] * sc), x1 = Math.round(CUT[i + 1] * sc);
+        var s = k.hide(k.el("div", "g1-sl", "left:" + (HX + x0) + "px;top:" + HY + "px;width:" + (x1 - x0) + "px;height:" + Math.round(IH * sc) + "px;", null, L.el));
+        var im = k.el("img", "", "left:" + (-x0) + "px;width:" + DW + "px;height:" + Math.round(IH * sc) + "px;", null, s);
+        im.src = "assets/validate-title.png";
+        s.style.transformOrigin = "50% 75%";
+        slices.push(s);
+      }
+      function rainArt(at) {
+        slices.forEach(function (s, i) {
+          var t = at + i * 0.045;
+          tl.fromTo(s, { autoAlpha: 0 }, ex({ autoAlpha: 1, duration: 0.08, ease: "none" }), t);
+          tl.fromTo(s, { y: -260, scaleY: 1.3 }, ex({ y: 0, scaleY: 0.8, duration: 0.3, ease: "power2.in" }), t);
+          tl.fromTo(s, { scaleY: 0.8 }, ex({ scaleY: 1, duration: 0.45, ease: "power2.out" }), t + 0.3);
+        });
+        return at + slices.length * 0.045 + 0.6;
+      }
+
+      // ===== S03 every valid combination in its OWN coding window; each body = THREE bar lines =====
+      var BAR = "BAR", BARTXT = "━━━━", FS = 38, LH = 56;
+      var COLS = [
+        ["try :", BAR, "except :", BAR],
+        ["try :", BAR, "except :", BAR, "else :", BAR],
+        ["try :", BAR, "except :", BAR, "else :", BAR, "finally :", BAR],
+        ["try :", BAR, "except :", BAR, "finally :", BAR],
+        ["try :", BAR, "finally :", BAR]
+      ];
+      function pad(s, n) { while (s.length < n) s += " "; return s; }
+      // steps: a keyword line, or a group of three bar lines (half-row pitch)
+      function build(W, items, kwInd, barInd, padTo) {
+        var row = 0, steps = [];
+        items.forEach(function (s) {
+          if (s.b !== undefined || s === BAR) {
+            var bi = typeof s === "object" ? s.b : barInd, g = [];
+            for (var j = 0; j < 3; j++) { var bl = W.add(pad(new Array(bi + 1).join(" ") + BARTXT, padTo), row + j * 0.42 - 0.1); bl.el.setAttribute("data-layout-allow-overlap", "true"); bl.chars.forEach(function (c) { c.setAttribute("data-layout-allow-overlap", "true"); }); g.push(bl); }
+            steps.push(g); row += 1.5;
+          } else {
+            var ki = typeof s === "object" ? s.k : kwInd, txt = typeof s === "object" ? s.t : s;
+            steps.push([W.add(pad(new Array(ki + 1).join(" ") + txt, padTo), row)]); row += 1;
+          }
+        });
+        return steps;
+      }
+      var WW = Math.round(26 + 12 * FS * 0.6 + 34), GAP = 40, X0 = Math.round((1920 - (5 * WW + 4 * GAP)) / 2);
+      var WINS = COLS.map(function (col, c) {
+        var w = k.win({ x: X0 + c * (WW + GAP), y: 230, w: WW, h: 300, title: "Main.py", dash: true, font: FS, lh: LH });
+        w.el.setAttribute("data-layout-allow-overlap", "true");
+        w.steps = build(w, col, 0, 2, 12);
+        return w;
+      });
+
+      // ===== S04 the nested skeleton, its own window =====
+      var nw = k.win({ x: 640, y: 196, w: 600, h: 600, title: "Main.py", dash: true, font: 44, lh: 54 });
+      var NEST = [{ t: "try :", k: 0 }, { t: "try :", k: 4 }, { b: 6 }, { t: "except :", k: 4 }, { b: 6 }, { t: "else :", k: 4 }, { b: 6 },
+                  { t: "finally :", k: 4 }, { b: 6 }, { t: "except :", k: 0 }, { b: 2 }];
+      nw.el.setAttribute("data-layout-allow-overlap", "true");
+      var NS = build(nw, NEST, 0, 2, 15);
+      Promise.resolve().then(function () { Promise.resolve().then(function () {
+        nw.el.style.left = Math.round((1920 - nw.hugW()) / 2) + "px";
+      }); });
+
+      function typeLine(W, Ln, at, per) { if (at < Ln.showAt) Ln.showAt = at; return W._type(Ln, at, per || 0.035); }
+      function step(W, g, at) {
+        if (g.length === 1) return typeLine(W, g[0], at, 0.03) + 0.12;
+        var e = at; g.forEach(function (Ln, j) { e = typeLine(W, Ln, at + j * 0.05, 0.025); });
+        return e + 0.15;
+      }
+
+      var t = 0.3;
+      // S02 heading, then 'try :' under it (window 1)
+      BEAT.S02r1 = t; t = rainArt(t) + 0.2;
+      BEAT.S02r2 = t; t = WINS[0].pop(t) + 0.2;
+      t = step(WINS[0], WINS[0].steps[0], t) + 0.5;
+      // S03 column 1: try / except
+      BEAT.S03r1 = t;
+      for (var r = 1; r < WINS[0].steps.length; r++) t = step(WINS[0], WINS[0].steps[r], t);
+      t += 0.5;
+      // combinations 2..5: each window pops, then its skeleton is typed
+      [1, 2, 3, 4].forEach(function (c) {
+        BEAT["S03c" + (c + 1)] = t;
+        t = WINS[c].pop(t) + 0.15;
+        WINS[c].steps.forEach(function (g) { t = step(WINS[c], g, t); });
+        t += 0.5;
+      });
+      // S04 the previous windows clear, the nested skeleton is written
+      BEAT.S04r1 = t; k.out(WINS.map(function (w) { return w.el; }), t, 0.4); t += 0.5;
+      BEAT.S04r2 = t; t = nw.pop(t) + 0.2;
+      NS.slice(0, 9).forEach(function (g) { t = step(nw, g, t); });
+      t += 0.5;
+      BEAT.S04r3 = t; t = step(nw, NS[9], t); t = step(nw, NS[10], t) + 1.0;
+      BEAT.end = t;
+      k.out([nw.el, L.el], t, 0.5);
+      window.__g1aEnd = t + 0.6;
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["g1-a"] = tl;
+    })();
+  </script>
+</template>

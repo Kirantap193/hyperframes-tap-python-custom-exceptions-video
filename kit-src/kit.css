@@ -1,0 +1,273 @@
+/* ============================================================================
+   Decorators in Python — shared design kit (video-10)
+   Black stage, jewel-tone colour coding, soft 3-D depth.
+   Colour meaning is fixed for the whole video:
+     orange  = the decorator / outer layer        teal   = inner / wrapper
+     violet  = the original function              pink   = the decorated name / ref
+     blue    = power_of / middle layer            amber  = notes, conditions
+     green   = good output / "no" branch          red    = errors
+   ========================================================================== */
+.k-stage { position: absolute; inset: 0; }
+.k-layer { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.k-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+
+/* colour channels: --c is "r, g, b" so rgba(var(--c), a) works, --ch is the solid hue */
+.c-orange { --c: 255, 158, 100; --ch: #ff9e64; --cd: #7a3a12; }
+.c-teal   { --c: 61, 220, 190;  --ch: #3ddcbe; --cd: #0f5a4d; }
+.c-neon   { --c: 234, 255, 0;   --ch: #eaff00; --cd: #5c6600; }
+.c-violet { --c: 180, 150, 255; --ch: #b496ff; --cd: #43307e; }
+.c-pink   { --c: 255, 107, 154; --ch: #ff6b9a; --cd: #7a1f3d; }
+.c-blue   { --c: 122, 162, 247; --ch: #7aa2f7; --cd: #22407e; }
+.c-amber  { --c: 255, 199, 119; --ch: #ffc777; --cd: #7a5612; }
+.c-green  { --c: 110, 231, 160; --ch: #6ee7a0; --cd: #16603a; }
+.c-red    { --c: 255, 95, 109;  --ch: #ff5f6d; --cd: #7a1620; }
+.c-white  { --c: 200, 211, 245; --ch: #e6ebff; --cd: #2a3450; }
+
+/* ---------- type ---------- */
+.k-sans { font-family: "Nunito", "Segoe UI", sans-serif; }
+.k-mono { font-family: "JetBrains Mono", Consolas, monospace; font-variant-ligatures: none; }
+.k-3d {
+  text-shadow: 0 -1px 0 rgba(255, 255, 255, 0.22), 0 2px 0 rgba(0, 0, 0, 0.7),
+               0 4px 0 rgba(0, 0, 0, 0.5), 0 10px 18px rgba(0, 0, 0, 0.65);
+}
+.k-3d-soft { text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6), 0 6px 12px rgba(0, 0, 0, 0.55); }
+.k-ch { display: inline-block; white-space: pre; }
+
+/* ---------- section header ---------- */
+.k-head { position: absolute; left: 64px; top: 38px; height: 76px; display: flex; align-items: center; gap: 22px; }
+.k-badge {
+  width: 66px; height: 66px; border-radius: 50%; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 800; font-size: 36px; color: #10131c;
+  background: radial-gradient(circle at 35% 30%, #fff7e6, #ffc777 45%, #e08a2c 100%);
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.25), 0 5px 0 #6b3c0c, 0 14px 26px rgba(0, 0, 0, 0.6);
+}
+.k-htitle {
+  font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 800; font-size: 50px; color: #f4f6ff;
+  white-space: pre; letter-spacing: 0.01em;
+}
+
+/* ---------- windows (code + output) ---------- */
+.k-win { position: absolute; transform-origin: 0 0; border-radius: 20px; }
+.k-win-body {
+  position: absolute; inset: 0; border-radius: 20px; overflow: hidden;
+  background: #101b2c; box-shadow: none;
+}
+.k-win-panel { position: absolute; left: 8px; top: 63px; right: 8px; bottom: 8px; border-radius: 10px; background: #101b2c; border: 1.5px solid #26344b; }
+.k-win-art { position: absolute; left: 22px; top: 11px; height: 37.6px; }
+.k-win.k-out .k-win-body { background: #0c1620; }
+.k-win.k-out .k-win-panel { background: #0c1620; border-color: #1f2c3d; }
+.k-win-bar { position: absolute; left: 0; top: 0; right: 0; height: 60px; background: #1b2536; border-bottom: 1.5px solid #2a3649; }
+.k-win.k-out .k-win-bar { background: #16202c; border-bottom-color: #222e3e; }
+.k-dot { position: absolute; top: 20px; width: 18px; height: 18px; border-radius: 50%; }
+.k-dot1 { left: 24px; background: #ff5f57; box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
+.k-dot2 { left: 52px; background: #febc2e; box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
+.k-dot3 { left: 80px; background: #28c840; box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
+.k-win-title {
+  position: absolute; left: 118px; top: 0; height: 58px; line-height: 58px;
+  font-family: "JetBrains Mono", Consolas, monospace; font-size: 24px; color: #9aa6c4; white-space: pre;
+}
+.k-win-dash { position: absolute; left: -17px; top: -17px; width: calc(100% + 34px); height: calc(100% + 34px); overflow: visible; }
+.k-win-dash rect {
+  x: 1.5px; y: 1.5px; width: calc(100% - 3px); height: calc(100% - 3px); rx: 36px;
+  fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 3; stroke-dasharray: 3 13; stroke-linecap: round;
+}
+.k-code {
+  position: absolute; left: 26px; top: 76px;
+  font-family: "JetBrains Mono", Consolas, monospace; font-variant-ligatures: none;
+  font-weight: 500; color: #ffffff;
+}
+.k-line { position: absolute; left: 0; white-space: pre; }
+.k-line > span { white-space: pre; }
+.k-win.k-out .k-code { color: #ffffff; font-weight: 500; }
+
+/* syntax colours (approved palette + fn names + decorators) */
+.t-kw  { color: #c099ff; }
+.t-str { color: #e0c78b; font-style: italic; }
+.t-num { color: #f5a97f; }
+.t-bi  { color: #8fb3ff; }
+.t-fn  { color: #8fb3ff; }
+.t-self { color: #d48fcf; }
+.t-com { color: #a6a6a6; font-style: italic; }
+.t-dec { color: #e3d55a; }
+.t-op  { color: #ffffff; }
+.o-ok  { color: #ffffff; }
+.o-err { color: #ff6b6b; }
+.o-dim { color: #7a849e; font-style: italic; }
+.o-amb { color: #ffc777; }
+
+/* token ring: the storyboard's outlined token, glowing */
+.k-ring {
+  position: absolute; border-radius: 6px; border: none; border-left: 6px solid var(--ch);
+  background: rgba(var(--c), 0.24); box-shadow: none; pointer-events: none;
+}
+.k-line > span { position: relative; }
+/* line highlight bar */
+.k-bar { position: absolute; left: -14px; border-radius: 8px; background: rgba(var(--c), 0.16); border-left: 6px solid var(--ch); }
+
+/* ---------- memory boxes ---------- */
+.k-var { position: absolute; }
+.k-var-label {
+  position: absolute; left: 2px; bottom: 100%; margin-bottom: 8px; white-space: pre;
+  font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 800; font-size: 30px; color: var(--ch);
+}
+.k-var-box {
+  position: absolute; inset: 0; border-radius: 14px; border: 3px solid var(--ch);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "JetBrains Mono", Consolas, monospace; font-weight: 500; font-size: 34px; color: #ffffff;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ch) 46%, #182030), color-mix(in srgb, var(--ch) 22%, #0c121d));
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.28), inset 0 -4px 0 rgba(0, 0, 0, 0.35), 0 3px 0 var(--cd), 0 6px 0 var(--cd), 0 9px 0 var(--cd), 0 11px 0 rgba(0, 0, 0, 0.65), 0 24px 30px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6), 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+.k-obj {
+  position: absolute; border-radius: 26px; border: 3px solid var(--ch);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ch) 26%, #141c2b), color-mix(in srgb, var(--ch) 10%, #0b111b));
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.28), inset 0 -4px 0 rgba(0, 0, 0, 0.35), 0 3px 0 var(--cd), 0 6px 0 var(--cd), 0 9px 0 var(--cd), 0 11px 0 rgba(0, 0, 0, 0.65), 0 24px 30px rgba(0, 0, 0, 0.6);
+}
+.k-obj-title {
+  position: absolute; left: 24px; top: 16px; white-space: pre;
+  font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 800; font-size: 30px; color: var(--ch);
+}
+.k-obj-code {
+  position: absolute; left: 24px; top: 62px; white-space: pre;
+  font-family: "JetBrains Mono", Consolas, monospace; font-variant-ligatures: none;
+  font-size: 25px; line-height: 36px; color: #c8d3f5;
+}
+
+/* ---------- panel, note, chip, table, diamond ---------- */
+.k-panel {
+  position: absolute; border-radius: 28px;
+  background: linear-gradient(180deg, #0c111b, #090d15);
+  border: 1.5px solid #1f2838;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 30px 70px rgba(0, 0, 0, 0.6);
+}
+.k-note {
+  position: absolute; border-radius: 18px; padding: 22px 28px 22px 34px;
+  background: linear-gradient(160deg, rgba(var(--c), 0.16), rgba(var(--c), 0.05));
+  border: 1.5px solid rgba(var(--c), 0.35);
+  box-shadow: inset 6px 0 0 var(--ch), 0 8px 0 rgba(0, 0, 0, 0.55), 0 20px 40px rgba(0, 0, 0, 0.55);
+  font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 600; font-size: 30px; line-height: 42px; color: #e9edf8;
+}
+.k-note b { color: var(--ch); font-weight: 800; }
+.k-note code, .k-cap code, .k-sum code {
+  font-family: "JetBrains Mono", Consolas, monospace; font-size: 0.88em; color: #ffffff;
+  background: rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 0 6px;
+}
+.k-cap {
+  position: absolute; font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 600;
+  font-size: 30px; line-height: 42px; color: #b9c2d8;
+}
+.k-cap b { color: #ffffff; font-weight: 800; }
+.k-chip {
+  position: absolute; border-radius: 16px; border: 3px solid var(--ch);
+  padding: 10px 22px; text-align: center; white-space: pre;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ch) 46%, #182030), color-mix(in srgb, var(--ch) 22%, #0c121d));
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.28), inset 0 -4px 0 rgba(0, 0, 0, 0.35), 0 3px 0 var(--cd), 0 6px 0 var(--cd), 0 9px 0 var(--cd), 0 11px 0 rgba(0, 0, 0, 0.65), 0 24px 30px rgba(0, 0, 0, 0.6);
+}
+.k-chip-main { font-family: "JetBrains Mono", Consolas, monospace; font-weight: 600; font-size: 30px; line-height: 40px; color: #ffffff;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6), 0 4px 0 rgba(0, 0, 0, 0.35); }
+.k-chip-sub { font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 700; font-size: 21px; line-height: 28px; color: #e8ecf6; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5); }
+.k-table {
+  position: absolute; border-radius: 20px; overflow: hidden;
+  border: 2px solid #2a3650; background: #0b1019;
+  box-shadow: 0 8px 0 #04060a, 0 30px 60px rgba(0, 0, 0, 0.6);
+}
+.k-tr { position: absolute; left: 0; right: 0; display: flex; align-items: center; }
+.k-th { background: linear-gradient(180deg, #1c2740, #151d30); border-bottom: 2px solid #2a3650; }
+.k-th .k-td { font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 800; font-size: 28px; color: #ffffff; }
+.k-td { padding: 0 24px; font-family: "JetBrains Mono", Consolas, monospace; font-size: 26px; line-height: 34px; color: #dfe5f5; white-space: pre; flex: none; }
+.k-tr.k-row + .k-tr.k-row { border-top: 1.5px solid #1c2538; }
+.k-pill {
+  display: inline-block; border-radius: 999px; padding: 2px 14px; font-size: 22px; font-weight: 700;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  color: var(--ch); background: rgba(var(--c), 0.16); border: 1.5px solid rgba(var(--c), 0.5);
+}
+.k-diamond {
+  position: absolute; transform-origin: 50% 50%;
+}
+.k-diamond-shape {
+  position: absolute; inset: 0; transform: rotate(45deg) scale(0.7071); border-radius: 14px;
+  border: 3px solid var(--ch);
+  background: linear-gradient(135deg, rgba(var(--c), 0.24), rgba(var(--c), 0.06));
+  box-shadow: 0 6px 0 var(--cd), 0 14px 26px rgba(0, 0, 0, 0.55);
+}
+.k-diamond-text {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: "JetBrains Mono", Consolas, monospace; font-size: 28px; color: #ffffff; white-space: pre;
+}
+.k-sum {
+  position: absolute; border-radius: 30px; padding: 46px 60px;
+  background: linear-gradient(170deg, #141c2e, #0c1220);
+  border: 2px solid #26324b;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 0 #05080e, 0 40px 90px rgba(0, 0, 0, 0.7);
+  font-family: "Nunito", "Segoe UI", sans-serif; color: #e9edf8;
+}
+.k-sum code { color: #ffc777; }
+
+/* pointer: a glowing chevron that glides to a target and taps it */
+.k-pointer { position: absolute; width: 56px; height: 56px; transform-origin: 50% 50%; pointer-events: none; }
+
+/* video-12: no section headings, no explanation boxes */
+.k-head, .k-note, .k-cap { display: none !important; }
+/* video-12: no pointer marks while highlighting */
+.k-pointer { display: none !important; }
+/* video-12: no code / output highlighting */
+.k-ring, .k-bar { display: none !important; }
+
+/* video-12: boxes in the user's glossy style (gl-frame-*.png, nine-sliced), white 3-D lettering */
+.k-chip, .k-obj, .k-var-box {
+  background: none !important; border: none !important; border-radius: 0 !important; box-shadow: none !important;
+}
+.k-chip::before, .k-obj::before, .k-var-box::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  border: 32px solid transparent; border-image: url("assets/gl-frame-violet.png") 90 fill stretch;
+}
+.k-chip > *, .k-obj > *, .k-var-box > * { position: relative; }
+.c-teal::before   { filter: hue-rotate(-95deg); }
+.c-blue::before   { filter: hue-rotate(-40deg); }
+.c-green::before  { filter: hue-rotate(-125deg); }
+.c-white::before, .c-grey::before { filter: saturate(0.25); }
+.c-pink::before, .c-orange::before, .c-amber::before, .c-red::before { border-image-source: url("assets/gl-frame-pink.png") !important; }
+.c-orange::before { filter: hue-rotate(40deg); }
+.c-amber::before  { filter: hue-rotate(55deg); }
+.c-red::before    { filter: hue-rotate(18deg); }
+.k-chip { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 30px !important; }
+.k-chip-main, .k-obj-title, .k-var-box {
+  font-family: "Nunito", "Segoe UI", sans-serif !important; font-weight: 800 !important; color: #ffffff !important;
+  text-shadow: 0 2px 0 #d8ccf6, 0 4px 0 #9c8ad8, 0 8px 10px rgba(0, 0, 0, 0.45) !important;
+}
+.k-chip-main span { color: #ffffff !important; }
+.k-chip-sub {
+  font-family: "Nunito", "Segoe UI", sans-serif !important; font-weight: 800 !important; color: #efe4ff !important;
+  text-shadow: 0 2px 0 rgba(110, 80, 180, 0.85), 0 5px 8px rgba(0, 0, 0, 0.4) !important;
+}
+.k-obj-title { left: 40px !important; top: 26px !important; }
+.k-obj-code { left: 40px !important; top: 66px !important; color: #ffffff !important; }
+/* the user's glossy arrow for straight box-to-box arrows */
+.k-glarrow { position: absolute; background: url("assets/gl-arrow.png") center / contain no-repeat; pointer-events: none; }
+/* roomier glossy boxes: taller, centred on their old position, larger lettering */
+.k-chip { min-height: 140px; margin-top: -22px; padding: 18px 26px !important; gap: 2px; }
+.k-chip-main { font-size: 34px !important; line-height: 42px !important;
+  text-shadow: 0 2px 0 #cbbdf0, 0 3px 0 #8f7ccf, 0 6px 8px rgba(0, 0, 0, 0.4) !important; }
+.k-chip-sub { font-size: 28px !important; line-height: 34px !important; }
+.k-obj-title { font-size: 34px !important; text-shadow: 0 2px 0 #cbbdf0, 0 3px 0 #8f7ccf, 0 6px 8px rgba(0, 0, 0, 0.4) !important; }
+/* the one highlight kept: the line being edited inside existing code */
+.k-ring.k-edit { display: block !important; }
+/* video-12: no bold anywhere - every text at normal weight, and no heavy stacked text edges */
+.k-stage *, [data-composition-id] * { font-weight: 400 !important; }
+.k-chip-main, .k-obj-title, .k-var-box, .g2-gb, .g5-cover {
+  text-shadow: 0 1px 0 rgba(203, 189, 240, 0.7), 0 3px 5px rgba(0, 0, 0, 0.45) !important;
+}
+.k-chip-sub { text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45) !important; }
+.k-3d, .k-3d-soft { text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5) !important; }
+/* normal-weight lettering, a size up to stay readable */
+.k-chip-main { font-size: 38px !important; line-height: 46px !important; }
+.k-chip-sub { font-size: 26px !important; line-height: 32px !important; }
+.g4-ch .k-chip-main { font-size: 29px !important; line-height: 36px !important; }
+.g4-ch .k-chip-sub { font-size: 23px !important; }
+.g2-mg .k-chip-main { font-size: 34px !important; line-height: 42px !important; }
+.g2-gb { font-size: 33px !important; }
+/* larger normal-weight box lettering */
+.k-chip-main { font-size: 42px !important; line-height: 50px !important; }
+.k-chip-sub { font-size: 28px !important; line-height: 34px !important; }
+.g2-mg .k-chip-main { font-size: 38px !important; line-height: 46px !important; }

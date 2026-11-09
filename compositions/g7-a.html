@@ -1,0 +1,205 @@
+<template id="g7-a-template">
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .g7-panel { position: absolute; border: 48px solid transparent; border-image: url("assets/mem-stack2.png") 110 fill stretch; }
+    .g7-panel.heap { border-image-source: url("assets/mem-heap2.png"); }
+    .g7-panel.cls { border-image-source: url("assets/mem-class2.png"); }
+    .g7-frame { position: absolute; border: 3px dashed rgba(255, 255, 255, .85); border-radius: 18px; }
+    .g7-fl { position: absolute; font-family: "Nunito", "Segoe UI", sans-serif; font-size: 30px; color: #4fd1ff; white-space: pre;
+      text-shadow: 0 2px 0 #0a5a86, 0 5px 8px rgba(0, 0, 0, .55); }
+    .g7-vn { position: absolute; font-family: "JetBrains Mono", Consolas, monospace; font-size: 24px; line-height: 40px; color: #4fd1ff; white-space: pre; }
+    .g7-vb { position: absolute; height: 40px; border-radius: 10px; background: linear-gradient(180deg, #16263d, #0b1524);
+      border: 2px solid #3ddcbe; box-shadow: 0 3px 0 #0f5a4d, 0 7px 9px rgba(0, 0, 0, .5); }
+    .g7-vv { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center;
+      font-family: "JetBrains Mono", Consolas, monospace; font-size: 22px; color: #fff; white-space: pre; }
+    .g7-s { color: #e0c78b; font-style: italic; } .g7-n { color: #f5a97f; }
+    .g7-obj { position: absolute; border-radius: 22px; background: linear-gradient(180deg, #1c1430, #120c22);
+      border: 3px solid #b496ff; box-shadow: 0 4px 0 #43307e, 0 8px 0 #2c1f55, 0 20px 30px rgba(0, 0, 0, .6); }
+    .g7-addr { position: absolute; font-family: "JetBrains Mono", Consolas, monospace; font-size: 30px; color: #f5a97f;
+      text-shadow: 0 2px 0 #7a3a12, 0 5px 8px rgba(0, 0, 0, .5); }
+    .g7-th { position: absolute; font-family: "Nunito", "Segoe UI", sans-serif; font-size: 28px; color: #ffd54a; white-space: pre; }
+    .g7-td { position: absolute; font-family: "JetBrains Mono", Consolas, monospace; font-size: 24px; color: #fff; white-space: pre; }
+    .g7-rule { position: absolute; background: #5a4a8a; }
+    .g7-set { position: absolute; border-radius: 12px; border: 3px solid #e9eef8; background: rgba(0, 0, 0, .25); }
+    .g7-tile { position: absolute; background: url("assets/tile.png") center / 100% 100% no-repeat; }
+    .g7-tc { position: absolute; left: 0; right: 0; top: 0; bottom: 6px; display: flex; align-items: center; justify-content: center;
+      font-family: "JetBrains Mono", Consolas, monospace; font-size: 40px; color: #111; }
+    .g7-ix { position: absolute; width: 80px; text-align: center; font-family: "JetBrains Mono", Consolas, monospace; font-size: 28px; color: #fff; }
+    .g7-ring { position: absolute; border: 4px solid #4fd1ff; border-radius: 18px; }
+    .g7-cloud { position: absolute; background: url("assets/cloud-plain.png") center / 100% 100% no-repeat; filter: hue-rotate(150deg) saturate(1.3); }
+    .g7-ct { position: absolute; left: 0; right: 0; top: 46%; transform: translateY(-50%); text-align: center;
+      font-family: "Nunito", "Segoe UI", sans-serif; font-size: 40px; color: #fff; white-space: pre;
+      text-shadow: 0 2px 0 #7a1620, 0 4px 0 #5a0f18, 0 8px 10px rgba(0, 0, 0, .55); }
+  </style>
+  <div data-hf-id="hf-7ssa" id="root" data-composition-id="g7-a" data-width="1920" data-height="1080" data-duration="47.2"></div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="assets/kit.js"></script>
+  <script src="assets/cx.js"></script>
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      var root = document.querySelector('[data-composition-id="g7-a"]');
+      var k = K.make(root, tl);
+      var BEAT = window.__g7aBeats = {};
+      function ex(o) { o.immediateRender = false; return o; }
+      function snap(e, at) { tl.fromTo(e, { autoAlpha: 0 }, ex({ autoAlpha: 1, duration: 0.01, ease: "none" }), at); return at; }
+      function unsnap(e, at) { tl.fromTo(e, { autoAlpha: 1 }, ex({ autoAlpha: 0, duration: 0.01, ease: "none" }), at); return at; }
+
+      // ================= code (smaller memory-scene font, the storyboard's split raise lines) =================
+      var cw = k.win({ x: 36, y: 150, w: 600, h: 400, title: "Main.py", dash: true, font: 20, lh: 27 });
+      var E = CX.editor(k, tl, cw, 31);
+      var SRC = E.load(["class DuplicateUserError(Exception):", "    pass", "", "class WeakPasswordError(Exception):", "    pass", "", "",
+        "class User:", "", "    user_name = set()", "", "    def __init__(self,un,mob,pwd):", "        self.un = un", "        self.mob = mob",
+        "        self.pwd = pwd", "        self.add_user()", "        self.validate()", "", "    def add_user(self):",
+        "        if self.un in User.user_name:", "            raise DuplicateUserError\\", "            ('Username already exist')",
+        "        else:", "            User.user_name.add(self.un)", "", "    def validate(self):", "        uc=lc=sp=num=0",
+        "        for i in self.pwd:", "            if i.isupper():", "                uc += 1", "            elif i.islower():",
+        "                lc += 1", "            elif i.isdigit():", "                num += 1", "            else:", "                sp += 1", "",
+        "        if len(self.pwd)<6 or uc==0 or\\", "        lc==0 or num==0 or sp==0:", "            raise WeakPasswordError\\",
+        "            ('Pasword not strong enough')", "", "", "def main():", "    un = input('Enter Username: ')",
+        "    mob = int(input('Enter Mobile: '))", "    pwd = input('Enter Password: ')", "", "    try:", "        u1 = User(un, mob, pwd)",
+        "    except DuplicateUserError as e:", "        print(e)", "    except WeakPasswordError as e:", "        print(e)", "    except:",
+        "        print('Hey some issue occured')", "    else:", "        print('Account created successfully')", "", "main()"], false);
+      function at(s) { for (var i = 0; i < SRC.length; i++) if (SRC[i].t === s) return SRC[i]; throw s; }
+      var eUser = at("class User:"), eSp = at("                sp += 1"), eUE = at("            ('Username already exist')"),
+          eVal = at("    def validate(self):"), eMain = at("def main():");
+
+      // ================= memory: Stack / Class variable / Heap (one layer so it can shrink at S74) =================
+      var M = k.layer({ x: 0, y: 56, w: 1920, h: 1080 });
+      var host = M.el;
+      function D(cls, css, html, parent) { var e = k.el("div", cls, css, html, parent || host); e.setAttribute("data-layout-allow-overlap", "true"); return k.hide(e); }
+      var tStack = CX.title(k, tl, "Stack", { x: 690, y: 92, w: 520, size: 46, host: host });
+      var tCls = CX.title(k, tl, "Class variable", { x: 1250, y: 92, w: 630, size: 46, color: "green", host: host });
+      var tHeap = CX.title(k, tl, "Heap", { x: 1250, y: 372, w: 630, size: 46, host: host });
+      var pStack = D("g7-panel", "left:690px;top:150px;width:520px;height:890px;");
+      var pCls = D("g7-panel cls", "left:1250px;top:150px;width:630px;height:200px;");
+      var pHeap = D("g7-panel heap", "left:1250px;top:430px;width:630px;height:610px;");
+      var unLbl = D("g7-vn", "left:1300px;top:185px;font-size:30px;color:#fff;", "user_name");
+      var setBox = D("g7-set", "left:1300px;top:245px;width:240px;height:60px;");
+      var setVal = D("g7-vv", "", '<span class="g7-s">\'Pythonfan\'</span>', setBox);
+
+      // a stack frame with value rows
+      function frame(y, rows, name) {
+        var F = { y: y, x: 740, w: 430, h: rows * 50 + 30 };
+        F.box = D("g7-frame", "left:740px;top:" + y + "px;width:430px;height:" + F.h + "px;");
+        F.lbl = D("g7-fl", "left:744px;top:" + (y - 42) + "px;", name);
+        return F;
+      }
+      function vrow(F, i, name, html, opt) {
+        opt = opt || {};
+        var y = F.y + 15 + i * 50, bx = opt.bx || 130, bw = opt.bw || 270;
+        var r = { n: D("g7-vn", "left:" + (F.x + (opt.nx || 22)) + "px;top:" + y + "px;", name),
+                  b: D("g7-vb", "left:" + (F.x + bx) + "px;top:" + y + "px;width:" + bw + "px;"), vals: [] };
+        r.y = y + 20; r.right = F.x + bx + bw;
+        (Array.isArray(html) ? html : [html]).forEach(function (h) { r.vals.push(D("g7-vv", "", h, r.b)); });
+        return r;
+      }
+      var S = function (s) { return '<span class="g7-s">\'' + s + '\'</span>'; }, Nn = function (n) { return '<span class="g7-n">' + n + '</span>'; };
+      var fMain = frame(830, 3, "main( )");
+      var mUn = vrow(fMain, 0, "un", S("Pythonfan")), mMob = vrow(fMain, 1, "mob", Nn("9975268922")), mPwd = vrow(fMain, 2, "pwd", S("#rooman123"));
+      var fInit = frame(550, 4, "__init__");
+      var iUn = vrow(fInit, 0, "un", S("Pythonfan")), iMob = vrow(fInit, 1, "mob", Nn("9975268922")), iPwd = vrow(fInit, 2, "pwd", S("#rooman123")),
+          iSelf = vrow(fInit, 3, "self", Nn("1000"));
+      var fVal = frame(320, 3, "validate( )");
+      function cnt(F, i, c, name, max) {
+        var vals = []; for (var v = 0; v <= max; v++) vals.push(Nn(String(v)));
+        return vrow(F, i, name, vals, { nx: c ? 222 : 22, bx: c ? 300 : 100, bw: 90 });
+      }
+      var cUC = cnt(fVal, 0, 0, "uc", 0), cLC = cnt(fVal, 0, 1, "lc", 6), cNUM = cnt(fVal, 1, 0, "num", 3), cSP = cnt(fVal, 1, 1, "sp", 1);
+      var vSelf = vrow(fVal, 2, "self", Nn("1000"));
+
+      // heap object at 1000 with its __dict__
+      var addr = D("g7-addr", "left:1300px;top:466px;", "1000");
+      var obj = D("g7-obj", "left:1290px;top:512px;width:550px;height:330px;");
+      var dTitle = D("g7-th", "left:1310px;top:526px;font-size:30px;color:#fff;", "__dict__");
+      var hKey = D("g7-th", "left:1330px;top:584px;", "key"), hVal = D("g7-th", "left:1560px;top:584px;", "value");
+      var rule1 = D("g7-rule", "left:1310px;top:626px;width:510px;height:2px;"), rule2 = D("g7-rule", "left:1450px;top:584px;width:2px;height:236px;");
+      var dRows = [["un", S("Pythonfan")], ["mob", Nn("9975268922")], ["pwd", S("#rooman123")]].map(function (r, i) {
+        var y = 644 + i * 60;
+        return [D("g7-td", "left:1330px;top:" + y + "px;color:#4fd1ff;", r[0]), D("g7-td", "left:1480px;top:" + y + "px;", r[1])];
+      });
+      var arInit = M.arrow({ d: "M" + iSelf.right + " " + iSelf.y + " H 1240 H 1286", width: 3, headSize: 12 });
+      var arVal = M.arrow({ d: "M" + vSelf.right + " " + vSelf.y + " H 1232 V 560 H 1286", width: 3, headSize: 12 });
+
+      // ================= password strip (S74), outside M =================
+      var PW = "#rooman123".split(""), TW = 84, TG = 12, TX = 880, TY = 150;
+      var S2 = k.layer({ x: 0, y: 56, w: 1920, h: 1080 });
+      var pwLbl = k.hide(k.el("div", "g7-vn", "left:" + (TX - 110) + "px;top:" + (TY + 18) + "px;font-size:40px;", "pwd", S2.el));
+      var tiles = PW.map(function (c, i) {
+        var x = TX + i * (TW + TG);
+        var tt = k.hide(k.el("div", "g7-tile", "left:" + x + "px;top:" + TY + "px;width:" + TW + "px;height:" + TW + "px;", '<div class="g7-tc">' + K.esc(c) + "</div>", S2.el));
+        var ix = k.hide(k.el("div", "g7-ix", "left:" + (x + 2) + "px;top:" + (TY - 44) + "px;", String(i), S2.el));
+        return { t: tt, ix: ix, x: x };
+      });
+      var ring = k.hide(k.el("div", "g7-ring", "left:" + (TX - 6) + "px;top:" + (TY - 6) + "px;width:" + (TW + 12) + "px;height:" + (TW + 12) + "px;", null, S2.el));
+
+      // the error burst
+      var py = k.hide(k.el("img", "", "position:absolute;left:640px;top:330px;width:120px;height:120px;", null, S2.el)); py.src = "assets/python-logo-3d-v2.png";
+      var cloud = k.hide(k.el("div", "g7-cloud", "left:740px;top:240px;width:520px;height:300px;", '<div class="g7-ct">WeakPasswordError</div>', S2.el));
+
+      // ================= timeline =================
+      function typeVal(r, i, at) { var v = r.vals[i || 0]; snap(v, at); return k.typeText(v, at, 0.035) + 0.1; }
+      function rowIn(r, at, empty) { k.fade(r.n, at, 0.2); k.fade(r.b, at + 0.05, 0.2); return empty ? at + 0.3 : typeVal(r, 0, at + 0.2); }
+      function setCnt(r, from, to, at) { if (from != null) unsnap(r.vals[from], at); snap(r.vals[to], at); return at; }
+
+      var t = 0.3;
+      // S68 the memory view: code at class User, the three panels, an empty main() frame
+      BEAT.S68r1 = t; k.fade(cw.el, t, 0.4); E.TOPE = eUser; t = E.apply(t + 0.05, 0, 0.015) + 0.3;
+      t = CX.rain(k, tl, tStack, t, { stagger: 0.04, drop: 60 }) - 0.4; k.pop(pStack, t - 0.2);
+      t = CX.rain(k, tl, tCls, t, { stagger: 0.03, drop: 60 }) - 0.4; k.pop(pCls, t - 0.3); k.fade(unLbl, t, 0.3); k.fade(setBox, t + 0.2, 0.3);
+      t = CX.rain(k, tl, tHeap, t + 0.2, { stagger: 0.04, drop: 60 }) - 0.2; k.pop(pHeap, t - 0.4); t += 0.6;
+      BEAT.S68r2 = t; k.fade(fMain.box, t, 0.35); k.fade(fMain.lbl, t, 0.35); t += 1.0;
+      // S69 inputs land in main(), then __init__ opens and the object 1000 appears
+      BEAT.S69r1 = t; t = E.go(eSp, t, 0.8) + 0.4;
+      [mUn, mMob, mPwd].forEach(function (r) { t = rowIn(r, t) + 0.5; });
+      BEAT.S69r2 = t; k.fade(fInit.box, t, 0.35); k.fade(fInit.lbl, t, 0.35); t += 0.5;
+      k.fade(addr, t, 0.3); k.pop(obj, t); t += 1.0;
+      // S70 __init__ frame: un, mob, pwd (empty), self 1000, then self -> 1000
+      BEAT.S70r1 = t; t = E.go(eUser, t, 0.8) + 0.4;
+      t = rowIn(iUn, t) + 0.3; t = rowIn(iMob, t) + 0.3; t = rowIn(iPwd, t, true) + 0.3; t = rowIn(iSelf, t) + 0.3;
+      BEAT.S70r2 = t; t = M.draw(arInit, t, 0.5) + 0.5;
+      // S71 pwd fills in, the __dict__ table opens
+      BEAT.S71r1 = t; t = typeVal(iPwd, 0, t) + 0.5;
+      BEAT.S71r2 = t; k.fade(dTitle, t, 0.3); k.fade(rule1, t + 0.1, 0.3); k.fade(rule2, t + 0.1, 0.3); k.fade(hKey, t + 0.2, 0.3); k.fade(hVal, t + 0.25, 0.3); t += 0.9;
+      // S72 attributes stored; add_user registers the name
+      BEAT.S72r1 = t; dRows.forEach(function (r) { snap(r[0], t); t = k.typeText(r[1], t + 0.15, 0.035) + 0.45; });
+      BEAT.S72r2 = t + 0.3; t += 0.3;
+      var fly = D("g7-vv", "left:1480px;top:644px;right:auto;bottom:auto;width:200px;height:34px;justify-content:flex-start;", S("Pythonfan"));
+      snap(fly, t); tl.fromTo(fly, { x: 0, y: 0 }, ex({ x: -170, y: -383, duration: 0.8, ease: "power2.inOut" }), t);
+      unsnap(fly, t + 0.82); snap(setVal, t + 0.82); t += 1.6;
+      // S73 validate() stacks on top: counters and self
+      BEAT.S73r1 = t; t = E.go(eUE, t, 0.8) + 0.3;
+      k.fade(fVal.box, t, 0.35); k.fade(fVal.lbl, t, 0.35); t += 0.5;
+      BEAT.S73r2 = t; [cUC, cLC, cNUM, cSP].forEach(function (r) { t = rowIn(r, t) + 0.15; }); t = rowIn(vSelf, t) + 0.2;
+      t = M.draw(arVal, t, 0.6) + 0.6;
+      // S74 the memory panel shrinks, the password strip slides in, the walk
+      BEAT.S74r1 = t;
+      tl.fromTo(M.el, { scale: 1 }, ex({ scale: 0.8, transformOrigin: "1880px 1040px", duration: 0.6, ease: "power2.inOut" }), t);
+      t += 0.5; k.fade(pwLbl, t, 0.3);
+      tiles.forEach(function (o, i) { tl.fromTo(o.t, { autoAlpha: 0, x: 60 }, ex({ autoAlpha: 1, x: 0, duration: 0.3, ease: "power3.out" }), t + i * 0.05); k.fade(o.ix, t + 0.2 + i * 0.05, 0.2); });
+      t += 1.2;
+      BEAT.S74r2 = t;
+      var ctr = { lc: 0, num: 0, sp: 0 }, R = { lc: cLC, num: cNUM, sp: cSP };
+      PW.forEach(function (c, i) {
+        if (i === 0) { tl.fromTo(ring, { autoAlpha: 0, x: 0 }, ex({ autoAlpha: 1, x: 0, duration: 0.2, ease: "none" }), t); }
+        else tl.fromTo(ring, { x: (i - 1) * (TW + TG) }, ex({ x: i * (TW + TG), duration: 0.35, ease: "power2.inOut" }), t);
+        t += 0.4;
+        var kind = /[a-z]/.test(c) ? "lc" : /[0-9]/.test(c) ? "num" : "sp";
+        setCnt(R[kind], ctr[kind], ctr[kind] + 1, t); ctr[kind] += 1;
+        t += 0.45;
+      });
+      // S75 the counts after the loop: uc==0 is True
+      BEAT.S75r1 = t; k.out(ring, t, 0.3); t += 1.8;
+      // S76 WeakPasswordError is raised
+      BEAT.S76r1 = t; k.pop(py, t); t = k.pop(cloud, t + 0.25) + 0.4; t = k.typeText(cloud.firstChild, t, 0.03) + 1.4;
+      // S77 caught in main(): except WeakPasswordError as e: print(e)
+      BEAT.S77r1 = t; k.out([cloud, py], t, 0.35); t = E.go(eMain, t + 0.1, 0.8) + 2.0;
+      BEAT.end = t;
+      k.out([cw.el, M.el, S2.el], t, 0.5);
+      window.__g7aEnd = t + 0.6;
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["g7-a"] = tl;
+    })();
+  </script>
+</template>

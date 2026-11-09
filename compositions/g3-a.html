@@ -1,0 +1,97 @@
+<template id="g3-a-template">
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  </style>
+  <div data-hf-id="hf-duqd" id="root" data-composition-id="g3-a" data-width="1920" data-height="1080" data-duration="57.8"></div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="assets/kit.js"></script>
+  <script src="assets/pm-cards.js"></script>
+  <script src="assets/cx.js"></script>
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      var root = document.querySelector('[data-composition-id="g3-a"]');
+      var k = K.make(root, tl);
+      var BEAT = window.__g3aBeats = {};
+
+      var cw = k.win({ x: 36, y: 150, w: 1000, h: 400, title: "Main.py", dash: true, font: 23, lh: 34 });
+      cw.el.setAttribute("data-layout-allow-overlap", "true");
+      var ow = k.win({ x: 1171, y: 150, w: 600, h: 200, title: "output", out: true, font: 19, lh: 27 });
+      ow.el.setAttribute("data-layout-allow-overlap", "true");
+      var R = CX.runner(k, tl, ow);
+      var E = CX.editor(k, tl, cw, 20);
+
+      // ================= UML (the Polymorphism class-card artwork) =================
+      var UML = k.layer({ x: 1180, y: 150, w: 685, h: 420 });
+      function card(x, y, w, color, name) {
+        var C = PMCARD.make(k, UML.el, { x: x, y: y, w: w, rows: 1, color: color, plate: "uml" });
+        C.name.textContent = name; C.name.style.fontSize = "30px"; C.name.style.lineHeight = "38px";
+        C.name.style.top = Math.round(PMCARD.F.headTop * w + (PMCARD.F.headH * w - 38) / 2) + "px";
+        return C;
+      }
+      var cExc = card(102, 0, 480, "blue", "Exception");
+      var cIMN = card(102, Math.round(cExc.h + 70), 480, "orange", "InvalidMobileNumberError");
+      var isa = UML.arrow({ d: "M342 " + Math.round(cExc.h + 70) + " V " + Math.round(cExc.h + 6), width: 3, headSize: 12 });
+      var isaL = CX.title(k, tl, "Is - A", { x: 372, y: Math.round(cExc.h + 12), size: 40, host: UML.el });
+
+      // ================= the program =================
+      var SRC = E.load(["def validate(mob):", "    if len(mob) == 10:", "        print('Valid Mobile Number')", "    else:",
+        "        raise ValueError", "", "", "def main():", "    mob = input()", "    validate(mob)", "", "main()"], true);
+      var eRaise = SRC[4];
+      var eCls = E.N("class InvalidMobileNumberError"), ePass = E.N("    pass");
+
+      function run(lines, at) { return R.run(lines, at); }
+
+      var t = 0.3;
+      // S12 the validator is written
+      BEAT.S12r1 = t; t = cw.pop(t) + 0.3;
+      t = E.typeRun(SRC, t, { per: 0.055 }) + 0.8;
+      BEAT.S12r2 = t; t += 1.2;                                   // walk through len(mob) == 10
+      // S13 run: a plain ValueError
+      BEAT.S13r1 = t; t = run([["99856"], ["ValueError", "o-err"]], t) + 1.6;
+      // S14 / S15 back to the code - the name says nothing about the problem
+      BEAT.S14r1 = t; t = R.hide(t) + 0.4;
+      BEAT.S15r1 = t; t += 1.5;
+      // S16 room for a class: the code slides down two lines
+      BEAT.S16r1 = t; t = E.ins(null, [eCls, E.B(), E.B()], t, 0.5) + 0.4;
+      // S17 the custom exception gets its name
+      BEAT.S17r1 = t; t = E.typeAt(eCls, t) + 1.0;
+      // S18 inherit from Exception, pass - then the UML
+      BEAT.S18r1 = t; t = E.ed(eCls, "class InvalidMobileNumberError(Exception):", t) + 0.6;
+      t = E.ins(eCls, [ePass], t, 0.4) + 0.2; t = E.typeAt(ePass, t) + 1.0;
+      BEAT.S18r2 = t; t = PMCARD.cardIn(k, tl, cExc, t) + 0.3;
+      t = UML.draw(isa, t, 0.45); t = CX.typeOn(k, tl, isaL, t, 0.05) + 0.3;
+      t = PMCARD.cardIn(k, tl, cIMN, t) + 1.0;
+      // S19 / S20 ValueError is replaced
+      BEAT.S19r1 = t; t = E.ed(eRaise, "        raise In", t) + 0.5;
+      BEAT.S20r1 = t; t = E.ed(eRaise, "        raise InvalidMobileNumberError", t) + 1.0;
+      // S21 / S22 run again: the traceback names the custom error (UML glides below the output)
+      BEAT.S21r1 = t;
+      tl.fromTo(UML.el, { y: 0 }, { y: 190, duration: 0.5, ease: "power2.inOut", immediateRender: false }, t);
+      t = run([["99856"], ["__main__.InvalidMobileNumberError", "o-err"]], t) + 1.6;
+      // S23 passing a message
+      BEAT.S23r1 = t; t = R.hide(t) + 0.3;
+      t = E.ed(eRaise, "        raise InvalidMobileNumberError('Enter 10 digit mobile number')", t) + 1.2;
+      // S24 the message appears in the error
+      BEAT.S24r1 = t; t = run([["99856"], ["__main__.InvalidMobileNumberError: Enter 10 digit mobile number", "o-err"]], t) + 1.6;
+      // S25 / S26 what if the class has no parent?
+      BEAT.S25r1 = t; t = R.hide(t) + 0.3;
+      t = E.ed(eCls, "class InvalidMobileNumberError():", t) + 1.2;
+      BEAT.S26r1 = t; t = E.ed(eCls, "class InvalidMobileNumberError:", t) + 0.3;
+      k.out(UML.el, t, 0.45); t += 1.0;
+      // S27 TypeError: takes no arguments
+      BEAT.S27r1 = t; t = run([["9856"], ["TypeError: InvalidMobileNumberError() takes no arguments", "o-err"]], t) + 1.6;
+      // S28 remove the message too
+      BEAT.S28r1 = t; t = R.hide(t) + 0.3;
+      t = E.ed(eRaise, "        raise InvalidMobileNumberError", t) + 1.2;
+      // S29 exceptions must derive from BaseException
+      BEAT.S29r1 = t; t = run([["9856"], ["TypeError: exceptions must derive from BaseException", "o-err"]], t) + 1.8;
+      BEAT.end = t;
+      k.out([cw.el, ow.el], t, 0.5);
+      window.__g3aEnd = t + 0.6;
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["g3-a"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,16 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>html,body{margin:0;width:1920px;height:1080px;background:#010101;overflow:hidden}</style></head><body>
+<script>
+(async function(){
+  var id = location.hash.slice(1);
+  var txt = await (await fetch('../compositions/'+id+'.html?'+Date.now())).text();
+  var tpl = document.createElement('div'); tpl.innerHTML = txt.replace(/<\/?template[^>]*>/g,'');
+  var scripts = [...tpl.querySelectorAll('script')]; scripts.forEach(s=>s.remove());
+  document.body.appendChild(tpl);
+  for (const s of scripts) { await new Promise(res=>{ var n=document.createElement('script'); if(s.src){ n.src=s.getAttribute('src').replace(/^assets/,'../assets'); n.onload=res; n.onerror=res; } else { n.textContent=s.textContent; } document.body.appendChild(n); if(!s.src) res(); }); }
+  await new Promise(r=>setTimeout(r,300));
+  var key = Object.keys(window).filter(k=>/^__g\w+End$/.test(k));
+  window.RESULT = {ends: key.map(k=>[k, window[k]]), squeeze: window.__hfSqueeze, dur: window.__timelines && window.__timelines[id] && window.__timelines[id].duration()};
+  document.title='done';
+})();
+</script></body></html>

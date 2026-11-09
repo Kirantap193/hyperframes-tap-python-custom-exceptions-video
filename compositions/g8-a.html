@@ -1,0 +1,57 @@
+<template id="g8-a-template">
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .g8-un { position: absolute; font-family: "JetBrains Mono", Consolas, monospace; font-size: 40px; color: #4fd1ff; white-space: pre; }
+  </style>
+  <div data-hf-id="hf-0oya" id="root" data-composition-id="g8-a" data-width="1920" data-height="1080" data-duration="13.4"></div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="assets/kit.js"></script>
+  <script src="assets/cx.js"></script>
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      var root = document.querySelector('[data-composition-id="g8-a"]');
+      var k = K.make(root, tl);
+      var BEAT = window.__g8aBeats = {};
+
+      var cw = k.win({ x: 36, y: 150, w: 900, h: 400, title: "Main.py", dash: true, font: 28, lh: 40 });
+      cw.el.setAttribute("data-layout-allow-overlap", "true");
+      var ow = k.win({ x: 919, y: 150, w: 600, h: 200, title: "output", out: true, font: 26, lh: 37 });
+      ow.el.setAttribute("data-layout-allow-overlap", "true");
+      var R = CX.runner(k, tl, ow);
+      var E = CX.editor(k, tl, cw, 20.5);
+      var SRC = E.load(["def main():", "    un = input('Enter Username: ')", "    mob = int(input('Enter Mobile: '))",
+        "    pwd = input('Enter Password: ')", "", "    try:", "        u1 = User(un, mob, pwd)",
+        "    except DuplicateUserError as e:", "        print(e)", "    except WeakPasswordError as e:", "        print(e)",
+        "    except:", "        print('Hey some issue occured')", "    else:", "        print('Account created successfully')", "", "main()"], false);
+      var eU1 = SRC[6], eU2 = E.N("        u2 = User(un, mob, pwd)");
+
+      // un -> 'pythonfan' (green box), right of the code
+      var D = k.layer({ x: 0, y: 56, w: 1920, h: 1080 });
+      var lab = CX.title(k, tl, "pythonfan", { x: 1080, y: 150, w: 700, size: 72, color: "green", host: D.el });
+      var unL = k.hide(k.el("div", "g8-un", "left:1110px;top:338px;", "un", D.el));
+      var box = CX.box(k, D.el, { x: 1330, y: 316, w: 360, h: 96, text: "'pythonfan'", color: "green", font: 40 });
+      var ar = D.arrow({ d: "M1180 364 H 1250 H 1322", width: 4, headSize: 14 });
+
+      var t = 0.3;
+      // S78 run the program: the main() code is on screen
+      BEAT.S78r1 = t; k.fade(cw.el, t, 0.4); t = E.apply(t + 0.05, 0, 0.02) + 1.2;
+      // S79 two users with the same name
+      BEAT.S79r1 = t; t = E.ins(eU1, [eU2], t, 0.4) + 0.2; t = E.typeAt(eU2, t, 0.05) + 0.9;
+      BEAT.S79r2 = t; t = CX.rain(k, tl, lab, t, { stagger: 0.05, drop: 80 }) + 0.2;
+      k.fade(unL, t, 0.3); t = D.draw(ar, t + 0.2, 0.45); t = CX.boxIn(k, tl, box, t, 0.04) + 1.2;
+      // S80 output: Username already exist (the diagram glides below the output)
+      BEAT.S80r1 = t;
+      tl.fromTo(D.el, { y: 0 }, { y: 300, duration: 0.5, ease: "power2.inOut", immediateRender: false }, t);
+      t = R.run([["Enter Username: pythonfan"], ["Enter Mobile: 9988556622"], ["Enter Password: #Rooman123"], ["Username already exist"]], t + 0.3) + 1.6;
+      // S81 wrap-up: the final main() held
+      BEAT.S81r1 = t; t += 2.0;
+      BEAT.end = t;
+      k.out([cw.el, ow.el, D.el], t, 0.6);
+      window.__g8aEnd = t + 0.7;
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["g8-a"] = tl;
+    })();
+  </script>
+</template>

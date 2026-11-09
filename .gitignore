@@ -1,0 +1,7 @@
+renders/
+*.mp4
+*.pptx
+snaps/
+snapshots/
+node_modules/
+.thumbnails/

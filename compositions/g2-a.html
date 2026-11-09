@@ -1,0 +1,85 @@
+<template id="g2-a-template">
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .g2-tree .cx-box::before { border-width: 18px; }
+  </style>
+  <div data-hf-id="hf-2hw0" id="root" data-composition-id="g2-a" data-width="1920" data-height="1080" data-duration="26.5"></div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="assets/kit.js"></script>
+  <script src="assets/cx.js"></script>
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      var root = document.querySelector('[data-composition-id="g2-a"]');
+      var k = K.make(root, tl);
+      var BEAT = window.__g2aBeats = {};
+      var L = k.layer({ x: 0, y: 56, w: 1920, h: 1080 });     // true frame coordinates
+      L.el.classList.add("g2-tree");
+
+      var head = CX.title(k, tl, "Exception Hierarchy", { x: 0, y: 22, w: 1920, size: 78, host: L.el });
+
+      var BH = 66, F = 22;
+      function B(text, x, y, w, color) { return CX.box(k, L.el, { x: x, y: y, w: w, h: BH, text: text, color: color, font: F }); }
+      // row 1 / row 2
+      var base = B("BaseException", 820, 150, 280, "pink");
+      var R2Y = 285, r2 = [["Exception", 250], ["SystemExit", 760], ["GeneratorExit", 1170], ["KeyboardInterrupt", 1560]]
+        .map(function (a, i) { return B(a[0], a[1] - 135, R2Y, i === 3 ? 290 : 270, "violet"); });
+      var exc = r2[0];
+      // row 3 - children of Exception
+      var R3Y = 420, W3 = 214, G3 = 16, X3 = 48;
+      var r3 = ["AttributeError", "ArithmeticError", "EOFError", "NameError", "LookupError", "OSError", "TypeError", "ValueError"]
+        .map(function (n, i) { return B(n, X3 + i * (W3 + G3), R3Y, W3, "blue"); });
+      // row 4 - columns under ArithmeticError, LookupError, OSError
+      var R4Y = 560, P4 = 82, W4 = 248;
+      function col(parent, names, w) {
+        return names.map(function (n, i) { return B(n, parent.left + 34, R4Y + i * P4, w || W4, "teal"); });
+      }
+      var arith = col(r3[1], ["ZeroDivisionError", "FloatingPointError", "OverflowError"]);
+      var look = col(r3[4], ["IndexError", "KeyError"], 170);
+      var os = col(r3[5], ["FileNotFoundError", "InterruptedError", "PermissionError", "TimeoutError"]);
+
+      // Is-A connectors: from the child up to its parent, head on the parent
+      function up(child, parent, busY) {
+        return L.arrow({ d: "M" + child.cx + " " + child.top + " V " + busY + " H " + parent.cx + " V " + (parent.bot + 2), width: 3, headSize: 11 });
+      }
+      function side(child, parent) {
+        var sx = parent.left + 16, my = child.top + BH / 2;
+        return L.arrow({ d: "M" + child.left + " " + my + " H " + sx + " V " + (parent.bot + 2), width: 3, headSize: 11 });
+      }
+      function item(bx, ar, at) {           // box enters -> its label types -> its connector draws
+        var t = CX.boxIn(k, tl, bx, at, 0.022);
+        if (ar) L.draw(ar, t - 0.05, 0.35);
+        return t + 0.2;
+      }
+
+      var t = 0.3;
+      BEAT.S05r1 = t; t = CX.rain(k, tl, head, t, { stagger: 0.045 }) + 0.6;
+      BEAT.S06r1 = t; t = item(base, null, t) + 0.6;
+      BEAT.S06r2 = t; t = item(exc, null, t) + 0.6;
+      // S07 row 2 siblings, then the connectors up to BaseException
+      BEAT.S07r1 = t;
+      for (var i = 1; i < 4; i++) t = item(r2[i], null, t);
+      r2.forEach(function (b, i) { L.draw(up(b, base, 252), t + i * 0.08, 0.4); });
+      t += 0.9;
+      // row 3 under Exception
+      BEAT.S07r2 = t;
+      for (i = 0; i < 7; i++) t = item(r3[i], up(r3[i], exc, 390), t);
+      t += 0.7;
+      // S08 ValueError joins row 3, then ArithmeticError's children
+      BEAT.S08r1 = t; t = item(r3[7], up(r3[7], exc, 390), t) + 0.7;
+      BEAT.S08r2 = t; arith.forEach(function (b) { t = item(b, side(b, r3[1]), t); }); t += 0.8;
+      // S09 LookupError, then OSError
+      BEAT.S09r1 = t; look.forEach(function (b) { t = item(b, side(b, r3[4]), t); }); t += 0.8;
+      BEAT.S09r2 = t; os.forEach(function (b) { t = item(b, side(b, r3[5]), t); }); t += 1.2;
+      // S10 / S11 hold the full tree
+      BEAT.S10r1 = t; t += 1.5;
+      BEAT.S11r1 = t; t += 1.5;
+      BEAT.end = t;
+      k.out(L.el, t, 0.5);
+      window.__g2aEnd = t + 0.6;
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["g2-a"] = tl;
+    })();
+  </script>
+</template>

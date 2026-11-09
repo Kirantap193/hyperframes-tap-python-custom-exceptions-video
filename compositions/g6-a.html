@@ -1,0 +1,134 @@
+<template id="g6-a-template">
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  </style>
+  <div data-hf-id="hf-k2qn" id="root" data-composition-id="g6-a" data-width="1920" data-height="1080" data-duration="115"></div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="assets/kit.js"></script>
+  <script src="assets/cx.js"></script>
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      var root = document.querySelector('[data-composition-id="g6-a"]');
+      var k = K.make(root, tl);
+      var BEAT = window.__g6aBeats = {};
+
+      var cw = k.win({ x: 36, y: 150, w: 1000, h: 400, title: "Main.py", dash: true, font: 28, lh: 40 });
+      var E = CX.editor(k, tl, cw, 20.5);
+      var N = E.N, B = E.B;
+      var eUser = E.load(["class User:"], true)[0];
+      var eUN = N("    user_name = set()"), eInit = N("    def __init__(self,):");
+      var eSU = N("        self.un = un"), eSM = N("        self.mob = mob"), eSP = N("        self.pwd = pwd");
+      var eAdd = N("    def add_user(self):"), eIf = N("        if sel");
+      var eRD = N("            raise DuplicateUserError('Username already exist')");
+      var eDup = N("class DuplicateUserError(Exception):"), eDupP = N("    pass");
+      var eElse = N("        else:"), eAddU = N("            user_name.add(self.un)");
+      var eVal = N("    def validate(self):"), eUC = N("        uc=lc=sp=num=0"), eFor = N("        for i in self.pwd:");
+      var eIU = N("            if i.isupper():"), eU1 = N("                uc += 1"), eIL = N("            elif i.islower():");
+      var eL1 = N("                lc += 1"), eID = N("            elif i.isdigit():"), eN1 = N("                num += 1");
+      var eEl = N("            else:"), eS1 = N("                sp += 1");
+      var eIfS = N("        if"), eIfS2 = N("        lc==0 or num==0 or sp==0:"), eRa = N("            ra"), eElse2 = N("        else");
+      var eSA = N("        self.add_user()"), eSV = N("        self.validate()");
+      var eMain = N("def main():"), eIn = N("    input('Enter Username: ')");
+      var eMob = N("    mob = int(input('Enter Mobile: '))"), ePw = N("    pwd = input('Enter Password: ')"), eUo = N("    u1 = User(un, mob, pwd)");
+      var eWk = N("class WeakPasswordError(Exception):"), eWkP = N("    pass");
+      var eTry = N("    try:"), eE1 = N("    except DuplicateUserError as e:"), eP1 = N("        print(e)");
+      var eE2 = N("    except WeakPasswordError as e:"), eP2 = N("        print(e)");
+      var eE3 = N("    except:"), eP3 = N("        print('Hey some issue occured')");
+      var eE4 = N("    else:"), eP4 = N("        print('Account created successfully')"), eCall = N("main()");
+
+      function ty(es, at) { return E.typeRun(es, at, { per: 0.045, line: 0.45 }); }
+      function add(after, items, at) { return E.ins(after, items, at, 0.4) + 0.15; }
+
+      var t = 0.3;
+      // S40 class User:
+      BEAT.S40r1 = t; t = cw.pop(t) + 0.3; t = ty([eUser], t) + 0.6;
+      // S41 class variable user_name
+      BEAT.S41r1 = t; t = add(eUser, [B(), eUN], t); t = ty([eUN], t) + 0.6;
+      // S42 / S43 constructor stub, cursor waits in the parameter list
+      BEAT.S42r1 = t; t = add(eUN, [B(), eInit], t); t = ty([eInit], t) + 0.3;
+      BEAT.S43r1 = t; t += 1.0;
+      // S44 un, mob, pwd stored
+      BEAT.S44r1 = t; t = E.ed(eInit, "    def __init__(self,un,mob,pwd):", t) + 0.7;
+      BEAT.S44r2 = t; t = add(eInit, [eSU, eSM, eSP], t); t = ty([eSU, eSM, eSP], t) + 0.6;
+      // S45 / S46 add_user: is the username taken?
+      BEAT.S45r1 = t; t = add(eSP, [B(), eAdd], t); t = ty([eAdd], t);
+      BEAT.S45r2 = t; t = add(eAdd, [eIf], t); t = ty([eIf], t) + 0.3;
+      BEAT.S46r1 = t; t = E.ed(eIf, "        if self.un in User.user_name", t) + 1.0;
+      // S47 raise DuplicateUserError
+      BEAT.S47r1 = t; t = E.ed(eIf, "        if self.un in User.user_name:", t) + 0.3;
+      t = add(eIf, [eRD], t); t = ty([eRD], t) + 1.0;
+      // S48 declaring DuplicateUserError at the top (code shifts down)
+      BEAT.S48r1 = t; t = add(null, [eDup, B(), B()], t) + 0.2;
+      BEAT.S48r2 = t; t = ty([eDup], t);
+      // S49 pass, then otherwise add the username (corrected to User.user_name)
+      BEAT.S49r1 = t; t = add(eDup, [eDupP], t); t = ty([eDupP], t) + 0.5;
+      BEAT.S49r2 = t; t = add(eRD, [eElse, eAddU], t); t = ty([eElse, eAddU], t) + 0.6;
+      BEAT.S49r3 = t; t = E.ed(eAddU, "            User.user_name.add(self.un)", t) + 0.8;
+      // S50 validate method
+      BEAT.S50r1 = t; t = add(eAddU, [B(), eVal], t); t = ty([eVal], t);
+      // S51 the editor scrolls up to __init__
+      BEAT.S51r1 = t; t = E.go(eInit, t, 0.6) + 0.5;
+      // S52 counters and the loop
+      BEAT.S52r1 = t; t = add(eVal, [eUC], t); t = ty([eUC], t) + 0.4;
+      BEAT.S52r2 = t; t = add(eUC, [eFor], t); t = ty([eFor], t) + 0.3;
+      // S53 upper and lower case
+      BEAT.S53r1 = t; t = add(eFor, [eIU, eU1], t); t = ty([eIU, eU1], t) + 0.3;
+      BEAT.S53r2 = t; t = add(eU1, [eIL], t); t = ty([eIL], t);
+      // S54 digits and special characters
+      BEAT.S54r1 = t; t = add(eIL, [eL1], t); t = ty([eL1], t);
+      BEAT.S54r2 = t; t = add(eL1, [eID, eN1], t); t = ty([eID, eN1], t);
+      BEAT.S54r3 = t; t = add(eN1, [eEl, eS1], t); t = ty([eEl, eS1], t) + 0.3;
+      // S55 starting the strength check
+      BEAT.S55r1 = t; t = E.go(eSP, t, 0.6) + 0.3;
+      t = add(eS1, [B(), eIfS], t); t = ty([eIfS], t) + 0.4;
+      // S56 the strength condition
+      BEAT.S56r1 = t; t = E.go(eVal, t, 0.6) + 0.3;
+      t = E.ed(eIfS, "        if len(self.pwd)<6 or uc==0 or\\", t) + 0.6;
+      BEAT.S56r2 = t; t = add(eIfS, [eIfS2], t); t = ty([eIfS2], t) + 0.4;
+      BEAT.S56r3 = t; t = add(eIfS2, [eRa], t); t = ty([eRa], t) + 0.3;
+      // S57 raise WeakPasswordError ('else' typed, then removed)
+      BEAT.S57r1 = t; t = E.ed(eRa, "            raise WeakPasswordError('Pasword not strong enough')", t) + 0.6;
+      BEAT.S57r2 = t; t = add(eRa, [eElse2], t); t = ty([eElse2], t) + 0.4;
+      t = E.del([eElse2], t, 0.4) + 0.4;
+      // S58 / S59 the whole class so far: who calls add_user and validate?
+      BEAT.S58r1 = t; t = E.go(eDup, t, 0.8) + 0.6;
+      BEAT.S59r1 = t; t = E.go(eUser, t, 0.5) + 1.6;
+      // S60 call both from the constructor
+      BEAT.S60r1 = t; t = add(eSP, [eSA], t); t = ty([eSA], t) + 0.3;
+      BEAT.S60r2 = t; t = add(eSA, [eSV], t); t = ty([eSV], t) + 0.6;
+      // S61 main(): reading input
+      BEAT.S61r1 = t; t = E.go(eIL, t, 0.8) + 0.3;
+      t = add(eRa, [B(), B(), eMain], t); t = ty([eMain], t);
+      t = add(eMain, [eIn], t); t = ty([eIn], t) + 0.9;
+      // S62 main(): building the user
+      BEAT.S62r1 = t; t = E.ed(eIn, "    un = input('Enter Username: ')", t) + 0.5;
+      t = add(eIn, [eMob, ePw], t); t = ty([eMob, ePw], t) + 0.4;
+      BEAT.S62r2 = t; t = add(ePw, [B(), eUo], t); t = ty([eUo], t) + 0.8;
+      // S63 where each error comes from
+      BEAT.S63r1 = t; t = E.go(eUN, t, 0.8) + 1.4;
+      // S64 declaring WeakPasswordError
+      BEAT.S64r1 = t; t = E.go(eDup, t, 0.6) + 0.3;
+      t = add(eDupP, [B(), eWk, eWkP], t); t = ty([eWk, eWkP], t) + 0.8;
+      // S65 try with two specific excepts
+      BEAT.S65r1 = t; t = E.go(eIfS, t, 0.9) + 0.3;
+      t = add(SRC_before(eUo), [eTry], t); t = ty([eTry], t) + 0.3;
+      t = E.ed(eUo, "        u1 = User(un, mob, pwd)", t) + 0.6;
+      BEAT.S65r2 = t; t = add(eUo, [eE1, eP1], t); t = ty([eE1, eP1], t) + 0.4;
+      BEAT.S65r3 = t; t = add(eP1, [eE2, eP2], t); t = ty([eE2, eP2], t) + 0.6;
+      // S66 generic except and else
+      BEAT.S66r1 = t; t = add(eP2, [eE3, eP3], t); t = ty([eE3, eP3], t) + 0.4;
+      BEAT.S66r2 = t; t = add(eP3, [eE4, eP4], t); t = ty([eE4, eP4], t) + 0.6;
+      // S67 calling main()
+      BEAT.S67r1 = t; t = add(eP4, [B(), eCall], t); t = ty([eCall], t) + 1.2;
+      BEAT.end = t;
+      k.out(cw.el, t, 0.5);
+      window.__g6aEnd = t + 0.6;
+
+      function SRC_before(e) { return E.SRC[E.SRC.indexOf(e) - 1]; }
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["g6-a"] = tl;
+    })();
+  </script>
+</template>

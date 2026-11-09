@@ -1,0 +1,62 @@
+<template id="g4-a-template">
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  </style>
+  <div data-hf-id="hf-r7pz" id="root" data-composition-id="g4-a" data-width="1920" data-height="1080" data-duration="52"></div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="assets/kit.js"></script>
+  <script src="assets/cx.js"></script>
+  <script>
+    (function () {
+      var tl = gsap.timeline({ paused: true });
+      var root = document.querySelector('[data-composition-id="g4-a"]');
+      var k = K.make(root, tl);
+      var BEAT = window.__g4aBeats = {};
+
+      var cw = k.win({ x: 36, y: 150, w: 1000, h: 400, title: "Main.py", dash: true, font: 26, lh: 38 });
+      cw.el.setAttribute("data-layout-allow-overlap", "true");
+      var ow = k.win({ x: 1171, y: 150, w: 600, h: 200, title: "output", out: true, font: 21, lh: 30 });
+      ow.el.setAttribute("data-layout-allow-overlap", "true");
+      var R = CX.runner(k, tl, ow);
+      var E = CX.editor(k, tl, cw, 22);
+
+      var SRC = E.load(["def menu(item):", "    if item=='pizza':", "        print('Enjoy your pizza')",
+        "    elif item=='idli':", "        print('Enjoy your idli')", "    elif item=='burger':",
+        "        print('Enjoy your burger')", "    else:", "        raise NameError", "",
+        "def main():", "    item = input()", "    menu(item)", "", "main()"], true);
+      var eRaise = SRC[8], eCall = SRC[12];
+      var eCls = E.N("class ItemNotInMenuError(Exception):"), ePass = E.N("    pass");
+      var eTry = E.N("    try:"), eExc = E.N("    except ItemNotInMenuError as e:"), ePr = E.N("        print(e)");
+
+      var t = 0.3;
+      // S30 example 2: a food menu
+      BEAT.S30r1 = t; t = cw.pop(t) + 0.3;
+      t = E.typeRun(SRC, t, { per: 0.05 }) + 0.8;
+      BEAT.S30r2 = t; t += 1.2;                                   // pizza / idli / burger branches
+      // S31 run: pasta raises NameError
+      BEAT.S31r1 = t; t = R.run([["pasta"], ["NameError", "o-err"]], t) + 1.6;
+      // S32 ItemNotInMenuError
+      BEAT.S32r1 = t; t = R.hide(t) + 0.3;
+      t = E.ins(null, [eCls, ePass, E.B(), E.B()], t, 0.5) + 0.3;
+      t = E.typeAt(eCls, t) + 0.9; t = E.typeAt(ePass, t) + 0.9;
+      BEAT.S32r2 = t; t = E.ed(eRaise, "        raise ItemNotInMenuError('Item not present in menu')", t) + 1.2;
+      // S33 the custom message in the error
+      BEAT.S33r1 = t; t = R.run([["pasta"], ["__main__.ItemNotInMenuError: Item not present in menu", "o-err"]], t) + 1.6;
+      // S34 handling it with try / except
+      BEAT.S34r1 = t; t = R.hide(t) + 0.3;
+      t = E.ins(SRC[SRC.indexOf(eCall) - 1], [eTry], t, 0.4) + 0.2; t = E.typeAt(eTry, t) + 0.6;
+      t = E.ed(eCall, "        menu(item)", t) + 0.6;
+      t = E.ins(eCall, [eExc], t, 0.4) + 0.2; t = E.typeAt(eExc, t) + 0.6;
+      t = E.ins(eExc, [ePr], t, 0.4) + 0.2; t = E.typeAt(ePr, t) + 1.0;
+      BEAT.S34r2 = t; t += 1.2;                                   // 'as e'
+      // S35 a clean message, no traceback
+      BEAT.S35r1 = t; t = R.run([["pasta"], ["Item not present in menu"]], t) + 1.8;
+      BEAT.end = t;
+      k.out([cw.el, ow.el], t, 0.5);
+      window.__g4aEnd = t + 0.6;
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["g4-a"] = tl;
+    })();
+  </script>
+</template>
